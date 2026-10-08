@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-08T11:15:36Z",
-  "mode": "ui-preview",
+  "generated_at": "2026-10-08T12:25:57Z",
+  "mode": "manual",
   "categories": [
     {"id":"botanical-garden","name":"植物園・温室・樹木園"},
     {"id":"flower-park","name":"花の名所・フラワーパーク"},
@@ -34,8 +34,37 @@
     {"id":"bonsai","name":"盆栽"}, {"id":"moss","name":"コケ"},
     {"id":"herbs","name":"ハーブ"}, {"id":"aquatic","name":"水草・水生植物"}
   ],
-  "facilities": [],
-  "targets": [],
+  "facilities": [
+    {
+      "id": "keisei-rose-garden",
+      "name": "京成バラ園",
+      "aliases": ["けいせいばらえん", "Keisei Rose Garden"],
+      "prefecture": "千葉県",
+      "city": "八千代市",
+      "categories": ["flower-park", "garden"],
+      "purposes": ["see"],
+      "public_access": true,
+      "official_url": "https://www.keiseirose.co.jp/garden/",
+      "verified_at": "2026-10-08T12:25:57Z",
+      "location": {
+        "lat": 35.731118,
+        "lon": 140.086538,
+        "source_url": "https://maruchiba.jp/spot/detail_10078.html",
+        "verified_at": "2026-10-08T12:25:57Z",
+        "precision": "site-reference"
+      },
+      "access_note": "千葉県八千代市大和田新田755。八千代緑が丘駅から徒歩約15分。今回は屋外のローズガーデンでバラを見るスポットとして登録しています。ローズガーデンは有料です。営業時間・入園料は季節やイベントで変わるため、公式案内をご確認ください。",
+      "sources": [
+        {"url":"https://www.keiseirose.co.jp/garden/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
+        {"url":"https://www.keiseirose.co.jp/garden/access/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
+        {"url":"https://www.keiseirose.co.jp/garden/businessguide/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
+        {"url":"https://maruchiba.jp/spot/detail_10078.html","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"}
+      ]
+    }
+  ],
+  "targets": [
+    {"id":"keisei-rose-garden-roses","facility_id":"keisei-rose-garden","plant_id":"rose","area":"ローズガーデン","environment":"outdoor","purposes":["see"]}
+  ],
   "observations": [],
   "forecasts": [],
   "seasonal_calendars": [],

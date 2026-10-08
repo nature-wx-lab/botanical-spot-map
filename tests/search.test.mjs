@@ -13,10 +13,16 @@ function fixture() {
   data.observations = [{ id: 'rose-observation', target_id: 'outdoor-rose', status: 'peak', inclusion_reason: 'seasonal-peak', observed_at: stamp, published_at: stamp, valid_from: stamp, valid_until: '2026-10-09T09:00:00+09:00', source_url: url, source_type: 'official', reviewed: true, viewable: true, withdrawn: false }];
   return data;
 }
-test('公開データには架空施設がなく、全21ジャンルを保持する', () => {
+test('実在する京成バラ園を初期表示・複合条件で検索し、未確認の見頃を合成しない', () => {
   const data = validateCatalog(JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url))));
   assert.equal(data.categories.length, 21);
-  assert.equal(data.facilities.length, 0);
+  const record = data.facilities.find(f => f.id === 'keisei-rose-garden');
+  assert.equal(record.name, '京成バラ園');
+  assert.deepEqual(record.location, { lat: 35.731118, lon: 140.086538, source_url: 'https://maruchiba.jp/spot/detail_10078.html', verified_at: record.verified_at, precision: 'site-reference' });
+  assert.equal(searchCatalog(data, {}, now).length, data.facilities.length);
+  assert.equal(searchCatalog(data, { query: '京成', prefecture: '千葉県', plant: 'rose', purposes: ['see'], environment: 'outdoor' }, now)[0].facility.id, record.id);
+  assert.equal(searchCatalog(data, { plant: 'agave' }, now).length, 0);
+  assert.equal(searchCatalog(data, { prefecture: '東京都' }, now).length, 0);
   assert.equal(searchCatalog(data, { peak: true }, now).length, 0);
 });
 test('植物未選択で見頃検索でき、複数見頃を施設として重複計数しない', () => {
