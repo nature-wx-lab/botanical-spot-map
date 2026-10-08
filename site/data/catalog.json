@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-08T12:25:57Z",
+  "generated_at": "2026-10-08T12:33:29Z",
   "mode": "manual",
   "categories": [
     {"id":"botanical-garden","name":"植物園・温室・樹木園"},
@@ -38,6 +38,13 @@
     {
       "id": "keisei-rose-garden",
       "name": "京成バラ園",
+      "label_priority": 1,
+      "summary": "約1,600品種のバラを楽しめる、春と秋が華やかな庭園",
+      "features": [
+        "約1,600品種・約10,000株のバラを植栽。",
+        "屋外のローズガーデンで、春と秋にバラの観賞を楽しめます。",
+        "園芸用品のガーデンセンター、ギフトショップ、カフェ・レストランを併設。"
+      ],
       "aliases": ["けいせいばらえん", "Keisei Rose Garden"],
       "prefecture": "千葉県",
       "city": "八千代市",
@@ -53,7 +60,7 @@
         "verified_at": "2026-10-08T12:25:57Z",
         "precision": "site-reference"
       },
-      "access_note": "千葉県八千代市大和田新田755。八千代緑が丘駅から徒歩約15分。今回は屋外のローズガーデンでバラを見るスポットとして登録しています。ローズガーデンは有料です。営業時間・入園料は季節やイベントで変わるため、公式案内をご確認ください。",
+      "access_note": "千葉県八千代市大和田新田755。八千代緑が丘駅から徒歩約15分。ローズガーデンは有料です。営業時間・入園料は季節やイベントで変わるため、公式案内をご確認ください。",
       "sources": [
         {"url":"https://www.keiseirose.co.jp/garden/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
         {"url":"https://www.keiseirose.co.jp/garden/access/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
@@ -67,6 +74,18 @@
   ],
   "observations": [],
   "forecasts": [],
-  "seasonal_calendars": [],
+  "seasonal_calendars": [
+    {
+      "id": "keisei-rose-garden-typical-season",
+      "target_id": "keisei-rose-garden-roses",
+      "basis": "typical-season",
+      "periods": [
+        {"label":"春","description":"5月上〜中旬から6月中旬ごろ"},
+        {"label":"秋","description":"10月中旬から11月下旬ごろ"}
+      ],
+      "source_url": "https://maruchiba.jp/spot/detail_10078.html",
+      "checked_at": "2026-10-08T12:33:29Z"
+    }
+  ],
   "events": []
 }

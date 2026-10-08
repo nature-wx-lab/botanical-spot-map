@@ -21,7 +21,8 @@ export function validateCatalog(data) {
   const categories = unique(data.categories, 'ジャンル'), plants = unique(data.plants, '植物');
   const facilities = unique(data.facilities, '施設'), targets = unique(data.targets, '対象');
   unique(data.observations, '現地情報');
-  for (const list of [data.forecasts, data.seasonal_calendars, data.events]) if (!Array.isArray(list) || list.length) fail('未対応の時期情報です');
+  unique(data.seasonal_calendars, '例年の見頃');
+  for (const list of [data.forecasts, data.events]) if (!Array.isArray(list) || list.length) fail('未対応の時期情報です');
   for (const entry of [...data.categories, ...data.plants]) if (typeof entry.name !== 'string' || !entry.name.trim()) fail('名称が必要です');
   for (const f of data.facilities) {
     if (typeof f.name !== 'string' || !f.name.trim() || !PREFECTURES.includes(f.prefecture) || typeof f.city !== 'string') fail('施設の基本情報が不正です');
@@ -30,6 +31,9 @@ export function validateCatalog(data) {
     if (!Array.isArray(f.purposes) || !f.purposes.length || f.purposes.some(p => !PURPOSES[p])) fail('施設の目的が不正です');
     if (!f.location || !Number.isFinite(f.location.lat) || !Number.isFinite(f.location.lon) || f.location.lat < 20 || f.location.lat > 46 || f.location.lon < 122 || f.location.lon > 154 || !safeUrl(f.location.source_url) || !validDate(f.location.verified_at) || !['entrance', 'site-reference'].includes(f.location.precision)) fail('確認済みの施設座標が必要です');
     if (!Array.isArray(f.sources) || !f.sources.length || f.sources.some(s => !safeUrl(s.url) || !validDate(s.checked_at) || s.use_basis !== 'independently-verified-facts')) fail('施設情報の利用根拠が必要です');
+    if (f.summary !== undefined && (typeof f.summary !== 'string' || !f.summary.trim() || f.summary.length > 80)) fail('施設の一言紹介が不正です');
+    if (f.features !== undefined && (!Array.isArray(f.features) || !f.features.length || f.features.length > 6 || f.features.some(s => typeof s !== 'string' || !s.trim() || s.length > 200))) fail('施設の特徴が不正です');
+    if (f.label_priority !== undefined && ![1, 2, 3].includes(f.label_priority)) fail('地図ラベルの優先度が不正です');
   }
   for (const t of data.targets) {
     if (!facilities.has(t.facility_id) || !plants.has(t.plant_id) || typeof t.area !== 'string' || !t.area.trim() || !ENVIRONMENTS[t.environment] || !Array.isArray(t.purposes) || !t.purposes.length || t.purposes.some(p => !PURPOSES[p])) fail('植物・場所・目的の関係が不正です');
@@ -40,6 +44,10 @@ export function validateCatalog(data) {
     if (!targets.has(o.target_id) || !['peak', 'flowering', 'starting', 'ending', 'ended', 'unknown'].includes(o.status) || ![null, 'seasonal-peak', 'notable-flowering'].includes(o.inclusion_reason)) fail('現地情報の関係・状態が不正です');
     if (![o.observed_at, o.published_at, o.valid_from, o.valid_until].every(validDate) || !safeUrl(o.source_url) || !['official', 'operator-observation'].includes(o.source_type) || o.reviewed !== true || typeof o.viewable !== 'boolean' || typeof o.withdrawn !== 'boolean') fail('現地情報の日時・確認が必要です');
     if (Date.parse(o.valid_until) <= Date.parse(o.valid_from) || Date.parse(o.observed_at) > Date.parse(o.published_at) || Date.parse(o.observed_at) > Date.parse(o.valid_from)) fail('現地情報の時系列が不正です');
+  }
+  for (const season of data.seasonal_calendars) {
+    if (!targets.has(season.target_id) || season.basis !== 'typical-season' || !safeUrl(season.source_url) || !validDate(season.checked_at)) fail('例年の見頃の対象・根拠が不正です');
+    if (!Array.isArray(season.periods) || !season.periods.length || season.periods.length > 4 || season.periods.some(p => typeof p.label !== 'string' || !p.label.trim() || p.label.length > 20 || typeof p.description !== 'string' || !p.description.trim() || p.description.length > 100)) fail('例年の見頃の時期が不正です');
   }
   return data;
 }
@@ -88,4 +96,34 @@ export function facetCounts(data, filters = {}, now = Date.now()) {
     }
   }
   return counts;
+}
+
+// Editorial priority changes label visibility only, never search results.
+// Keep labels inside the map and give prominent facilities first use of space.
+export function mapMarkerPlan(points, zoom, size, selectedId = null) {
+  const kept = [], spacing = zoom >= 14 ? 0 : zoom >= 12 ? 28 : zoom >= 9 ? 44 : 60;
+  for (const point of [...points].sort((a, b) => Number(b.facility.id === selectedId) - Number(a.facility.id === selectedId) || (a.facility.label_priority || 3) - (b.facility.label_priority || 3) || a.facility.id.localeCompare(b.facility.id))) {
+    if (point.x < -20 || point.y < -20 || point.x > size.x + 20 || point.y > size.y + 20) continue;
+    if (kept.some(p => Math.hypot(p.x - point.x, p.y - point.y) < spacing)) continue;
+    kept.push(point);
+  }
+  return kept.map(point => point.facility.id);
+}
+export function mapLabelPlan(points, zoom, size) {
+  const labels = [], occupied = [];
+  const gap = zoom >= 14 ? 4 : 12;
+  for (const point of [...points].sort((a, b) => (a.facility.label_priority || 3) - (b.facility.label_priority || 3) || a.facility.id.localeCompare(b.facility.id))) {
+    const { facility: f, x, y } = point, priority = f.label_priority || 3;
+    if (zoom < (priority === 1 ? 7 : priority === 2 ? 10 : 12) || x < 0 || y < 0 || x > size.x || y > size.y) continue;
+    const tier = zoom >= 13 && f.summary ? 2 : 1;
+    const width = tier === 2 ? 232 : Math.min(200, Math.max(100, [...f.name].length * 15 + 24));
+    const height = tier === 2 ? 66 : 36, offset = zoom >= 12 ? 22 : 18;
+    const direction = x + offset + width <= size.x - 8 ? 'right' : 'left';
+    const left = direction === 'right' ? x + offset : x - offset - width;
+    const box = { left, right: left + width, top: y - height / 2, bottom: y + height / 2 };
+    if (box.left < 8 || box.right > size.x - 8 || box.top < 8 || box.bottom > size.y - 8) continue;
+    if (occupied.some(b => box.left < b.right + gap && box.right > b.left - gap && box.top < b.bottom + gap && box.bottom > b.top - gap)) continue;
+    occupied.push(box); labels.push({ id: f.id, tier, direction, width });
+  }
+  return labels;
 }

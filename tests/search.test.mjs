@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validateCatalog, searchCatalog, safeUrl, currentObservations, facetCounts } from '../site/engine.mjs';
+import { validateCatalog, searchCatalog, safeUrl, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan } from '../site/engine.mjs';
 const now = Date.parse('2026-10-08T12:00:00+09:00');
 function fixture() {
   const data = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
   data.mode = 'manual';
+  data.seasonal_calendars = [];
   const url = 'https://example.org/';
   const stamp = '2026-10-08T09:00:00+09:00';
   data.facilities = [{ id: 'test-garden', name: '試験用施設', city: '試験', prefecture: '東京都', categories: ['botanical-garden'], purposes: ['see', 'buy'], public_access: true, official_url: url, verified_at: stamp, location: { lat: 35, lon: 139, source_url: url, verified_at: stamp, precision: 'site-reference' }, sources: [{ url, checked_at: stamp, use_basis: 'independently-verified-facts' }] }];
@@ -96,4 +97,31 @@ test('条件ごとの件数はほかの条件を保ち、植物・場所・見�
   assert.equal(counts.plant.agave, 0);
   assert.equal(counts.environment.greenhouse, 0);
   assert.equal(counts.purposes.buy, 0);
+});
+test('例年の時期は現地情報の代わりにならず、無効な紹介・時期の根拠で公開を止める', () => {
+  const published = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
+  assert.equal(published.seasonal_calendars[0].target_id, 'keisei-rose-garden-roses');
+  assert.equal(published.seasonal_calendars[0].periods.length, 2);
+  assert.equal(currentObservations(published, now).length, 0);
+  assert.equal(searchCatalog(published, { peak: true, plant: 'rose' }, now).length, 0);
+  for (const change of [d => d.seasonal_calendars[0].target_id = 'missing', d => d.seasonal_calendars[0].source_url = 'javascript:alert(1)', d => d.seasonal_calendars[0].basis = 'current-peak', d => d.facilities[0].features = 'not-an-array', d => d.facilities[0].label_priority = 0]) {
+    const data = structuredClone(published); change(data); assert.throws(() => validateCatalog(data));
+  }
+});
+test('広域はアイコン中心、優先施設の名前、通常の名前、一言紹介の順に表示を増やす', () => {
+  const points = [{ x: 200, y: 160, facility: { id: 'prominent', name: '優先施設', label_priority: 1, summary: '一言紹介' } }, { x: 600, y: 160, facility: { id: 'regular', name: '通常施設', summary: '一言紹介' } }];
+  const size = { x: 1000, y: 500 };
+  assert.equal(mapLabelPlan(points, 5, size).length, 0);
+  assert.deepEqual(mapLabelPlan(points, 8, size).map(p => [p.id, p.tier]), [['prominent', 1]]);
+  assert.deepEqual(mapLabelPlan(points, 12, size).map(p => [p.id, p.tier]), [['prominent', 1], ['regular', 1]]);
+  assert.deepEqual(mapLabelPlan(points, 13, size).map(p => p.tier), [2, 2]);
+});
+test('密集する地図ラベルは優先順で間引き、画面端では内側に表示する', () => {
+  const points = [{ x: 200, y: 160, facility: { id: 'regular', name: '通常施設' } }, { x: 210, y: 165, facility: { id: 'prominent', name: '優先施設', label_priority: 1 } }];
+  assert.deepEqual(mapLabelPlan(points, 12, { x: 1000, y: 500 }).map(p => p.id), ['prominent']);
+  assert.deepEqual(mapMarkerPlan(points, 5, { x: 1000, y: 500 }), ['prominent']);
+  assert.deepEqual(mapMarkerPlan(points, 14, { x: 1000, y: 500 }), ['prominent', 'regular']);
+  assert.deepEqual(mapMarkerPlan(points, 5, { x: 1000, y: 500 }, 'regular'), ['regular']);
+  assert.equal(mapLabelPlan([{ ...points[1], x: 950 }], 12, { x: 1000, y: 500 })[0].direction, 'left');
+  assert.equal(mapLabelPlan([{ ...points[1], x: -10 }], 12, { x: 1000, y: 500 }).length, 0);
 });
