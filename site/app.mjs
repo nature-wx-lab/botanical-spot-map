@@ -40,7 +40,7 @@ function render() {
   if (!results.length) {
     const empty = node('div', undefined, 'empty');
     empty.append(node('h3', catalog.facilities.length ? '条件に合う登録情報がありません' : '施設データを順次整備します'));
-    empty.append(node('p', catalog.facilities.length ? (f.peak ? '条件に合う有効な見頃情報は登録されていません。見頃ではないという意味ではありません。' : '条件を変更すると、ほかの登録施設を探せます。') : '初回は地図と検索UIを公開しています。公式情報と所在地を確認した施設から追加します。架空のピンや未確認の見頃は掲載していません。'));
+    empty.append(node('p', catalog.facilities.length ? (f.peak ? '条件に合う有効な見頃情報は登録されていません。見頃ではないという意味ではありません。' : '条件を変更すると、ほかの登録施設を探せます。') : '公式情報を確認した施設から追加します。'));
     list.append(empty);
   }
   for (const result of results) {
@@ -61,7 +61,7 @@ $('search').addEventListener('submit', e => e.preventDefault());
 $('search').addEventListener('input', render);
 $('search').addEventListener('change', render);
 $('reset-filters').addEventListener('click', () => { $('search').reset(); render(); });
-$('show-japan').addEventListener('click', () => { if (map) map.fitBounds(japanBounds, { padding: [20, 30] }); });
+$('show-japan').addEventListener('click', () => { if (map) map.fitBounds(japanBounds, { padding: [20, 30] }); $('about').close(); });
 $('map-stop').addEventListener('click', () => { if (!map || !tiles) return; mapStopped = !mapStopped; if (mapStopped) map.removeLayer(tiles); else tiles.addTo(map); $('map-stop').textContent = mapStopped ? '地図通信を再開' : '地図通信を停止'; $('map-stop').setAttribute('aria-pressed', String(mapStopped)); $('map-error').hidden = true; });
 $('about-open').addEventListener('click', () => $('about').showModal());
 $('about-close').addEventListener('click', () => $('about').close());
