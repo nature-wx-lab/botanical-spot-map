@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-08T11:15:36Z",
+  "mode": "ui-preview",
+  "categories": [
+    {"id":"botanical-garden","name":"植物園・温室・樹木園"},
+    {"id":"flower-park","name":"花の名所・フラワーパーク"},
+    {"id":"garden","name":"日本庭園・洋風庭園"},
+    {"id":"cultural-garden","name":"寺社・文化施設の植物スポット"},
+    {"id":"urban","name":"街なかの植物スポット"},
+    {"id":"heritage-tree","name":"巨樹・古木・名木"},
+    {"id":"garden-center","name":"園芸店・ガーデンセンター"},
+    {"id":"specialist-houseplants","name":"観葉植物・珍奇植物の専門店"},
+    {"id":"specialist-bonsai","name":"盆栽・山野草・蘭・苔の専門店"},
+    {"id":"nursery","name":"種苗店・生産者直売所"},
+    {"id":"florist","name":"花屋・フラワーショップ"},
+    {"id":"garden-supplies","name":"園芸資材・植木鉢の店"},
+    {"id":"farm-market","name":"道の駅・JA直売所・花木センター"},
+    {"id":"aquatic-plants","name":"水草・ビオトープ関連店"},
+    {"id":"learning","name":"植物を学ぶ施設"},
+    {"id":"workshop","name":"園芸教室・体験工房"},
+    {"id":"picking-farm","name":"観光農園・果樹園・花摘み園"},
+    {"id":"allotment","name":"貸農園・体験農園"},
+    {"id":"garden-cafe","name":"植物を楽しむカフェ・宿泊施設"},
+    {"id":"nature-trail","name":"自然の植物観察スポット"},
+    {"id":"plant-event","name":"期間限定の植物イベント"}
+  ],
+  "plants": [
+    {"id":"rose","name":"バラ"}, {"id":"cosmos","name":"コスモス"},
+    {"id":"dahlia","name":"ダリア"}, {"id":"hydrangea","name":"アジサイ"},
+    {"id":"cherry","name":"サクラ"}, {"id":"maple","name":"モミジ・紅葉"},
+    {"id":"orchid","name":"ラン"}, {"id":"succulents","name":"多肉植物・サボテン"},
+    {"id":"agave","name":"アガベ"}, {"id":"houseplants","name":"観葉植物"},
+    {"id":"bonsai","name":"盆栽"}, {"id":"moss","name":"コケ"},
+    {"id":"herbs","name":"ハーブ"}, {"id":"aquatic","name":"水草・水生植物"}
+  ],
+  "facilities": [],
+  "targets": [],
+  "observations": [],
+  "forecasts": [],
+  "seasonal_calendars": [],
+  "events": []
+}

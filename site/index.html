@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cyberjapandata.gsi.go.jp; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <title>植物めぐりMAP | Botanical Spot Map</title>
+  <meta name="description" content="植物を見たい・買いたい・学びたい・体験したい場所を地図から探す、植物めぐりMAP。施設データを順次整備する初期公開版です。">
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./vendor/leaflet.js" defer></script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#search">検索条件へ</a>
+  <header class="header">
+    <div class="brand"><span class="brand-icon" aria-hidden="true">❧</span><div><h1>植物めぐりMAP</h1><span class="english">Botanical Spot Map</span></div><span class="beta">初期公開版</span></div>
+    <p class="tagline">見る・買う・学ぶ・体験する。植物との出会いを、地図から。</p>
+    <button id="about-open" class="subtle">このMAPについて</button>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar" aria-label="検索と施設一覧">
+      <form id="search" autocomplete="off">
+        <div class="section-heading"><h2>植物スポットを探す</h2><button id="reset-filters" type="button" class="text-button">条件を解除</button></div>
+        <label class="field">施設名・地域・キーワード<input id="query" type="search" placeholder="例：植物園、バラ、温室" maxlength="100"></label>
+        <label class="peak-switch"><input id="peak" type="checkbox"><span><strong>いま見頃あり</strong><small>植物を選ばずに探せます</small></span><span class="switch-track" aria-hidden="true"></span></label>
+        <fieldset class="purpose"><legend>目的 <span>複数選択可</span></legend><div class="purpose-options"><label><input type="checkbox" name="purpose" value="see"><span>見る</span></label><label><input type="checkbox" name="purpose" value="buy"><span>買う</span></label><label><input type="checkbox" name="purpose" value="learn"><span>学ぶ</span></label><label><input type="checkbox" name="purpose" value="experience"><span>体験</span></label><label><input type="checkbox" name="purpose" value="harvest"><span>収穫</span></label></div></fieldset>
+        <div class="field-grid"><label class="field">都道府県<select id="prefecture"><option value="">全国</option></select></label><label class="field">屋内・屋外<select id="environment"><option value="">指定なし</option><option value="outdoor">屋外</option><option value="indoor">屋内（温室を含む）</option><option value="greenhouse">温室</option></select></label></div>
+        <label class="field">施設ジャンル<select id="category"><option value="">すべてのジャンル</option></select></label>
+        <label class="field">植物・植物グループ<select id="plant"><option value="">すべての植物</option></select></label>
+        <p class="filter-hint">同じ目的は「いずれか」、別の条件は「すべて一致」で絞ります。</p>
+      </form>
+      <section class="results" aria-labelledby="result-heading"><div class="result-header"><h2 id="result-heading">施設一覧 <span id="result-count">0</span><small>件</small></h2><span id="conditions">全スポット</span></div><div id="result-list" aria-live="polite"><p>データを読み込んでいます。</p></div></section>
+      <div class="data-status"><span class="status-dot" aria-hidden="true"></span><span id="data-status">公開データを確認中</span></div>
+    </aside>
+    <section class="map-section" aria-label="全国の植物スポット地図">
+      <div class="map-toolbar"><span>全国の植物スポット</span><div><button id="show-japan" class="subtle">日本全体</button><button id="map-stop" class="subtle" aria-pressed="false">地図通信を停止</button></div></div>
+      <div class="map-frame"><div id="map" aria-label="地図。矢印キーで移動し、プラス・マイナスで拡大縮小できます"></div><div id="map-message" class="map-message" role="status">施設データを準備しています</div><div id="map-error" class="map-error" role="status" hidden>背景地図の一部を取得できません。施設一覧は利用できます。</div></div>
+      <div class="map-footer"><span class="legend"><i aria-hidden="true"></i>施設 <i class="peak-color" aria-hidden="true"></i>見頃・注目の開花</span><span>地図をドラッグで移動・拡大縮小</span></div>
+      <details class="map-attribution"><summary>地図の出典・通信について</summary><p>背景地図：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">地理院タイル（淡色地図）</a>。地図画像は国土地理院の配信先から読み込みます。配信先へIPアドレスや表示範囲に対応するタイル番号が伝わります。「地図通信を停止」で背景地図の読み込みを止められます。</p><p lang="en">Shoreline data is derived from: United States. National Imagery and Mapping Agency. "Vector Map Level 0 (VMAP0)." Bethesda, MD: Denver, CO: The Agency; USGS Information Services, 1997.</p></details>
+    </section>
+  </main>
+  <footer class="footer"><span>NatureWxLab</span><span>施設の営業・観覧条件は公式情報でご確認ください。</span><a href="https://github.com/nature-wx-lab/botanical-spot-map/issues/new" target="_blank" rel="noopener noreferrer">不具合・掲載情報の訂正</a></footer>
+  <dialog id="about"><div class="dialog-heading"><h2>植物めぐりMAPについて</h2><button id="about-close" class="subtle">閉じる</button></div><p>全国の、植物を見る・買う・学ぶ・体験する場所を探すMAPです。植物園だけでなく、専門店・直売所・体験施設なども順次登録します。</p><p><strong>現在は地図と検索UIの初期公開版です。施設・見頃データはまだ登録していません。</strong>掲載されていないことは、施設や見頃が存在しないという意味ではありません。</p><p>「いま見頃あり」は、植物・園内エリア・情報日・根拠・有効期限が確認された対象だけを検索します。季節の見頃と温室の注目の開花を扱い、例年の時期や予想を現在の見頃に置き換えません。見頃と営業中は別の情報です。</p><p>公表予想、例年の時期、イベント、情報の自動更新は今後の追加予定です。</p><h3>プライバシー</h3><p>この版は現在地の取得、会員登録、アクセス解析を行いません。検索条件をURLやブラウザの保存領域へ記録せず、検索語を外部へ送る処理はありません。ホスティング元のGitHubと背景地図の配信先には通常のWeb通信が発生します。</p><p>訂正はGitHub Issuesで受け付けます。投稿内容は公開されるため、個人の連絡先や非公開の所在地は書かないでください。</p><p><a href="https://github.com/nature-wx-lab/botanical-spot-map" target="_blank" rel="noopener noreferrer">GitHubリポジトリ・更新内容</a></p></dialog>
+  <noscript><p class="noscript">地図と絞り込みにはJavaScriptが必要です。この版は施設データを準備中です。</p></noscript>
+</body>
+</html>
