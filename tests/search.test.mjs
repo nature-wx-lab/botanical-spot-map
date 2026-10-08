@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validateCatalog, searchCatalog, safeUrl, currentObservations } from '../site/engine.mjs';
+import { validateCatalog, searchCatalog, safeUrl, currentObservations, facetCounts } from '../site/engine.mjs';
 const now = Date.parse('2026-10-08T12:00:00+09:00');
 function fixture() {
   const data = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
@@ -53,4 +53,41 @@ test('不正座標・参照・日付・URL・未対応予想で公開を止め�
 test('リンク先にスクリプト・認証情報・ローカル・HTTPを許可しない', () => {
   for (const url of ['javascript:alert(1)', 'data:text/html,test', 'http://example.org/', 'https://' + 'a:b@' + 'example.org/', 'https://localhost/', 'https://127.0.0.1/']) assert.equal(safeUrl(url), null);
   assert.equal(safeUrl('https://example.org/'), 'https://example.org/');
+});
+function filterFixture() {
+  const data = fixture();
+  const garden = data.facilities[0];
+  data.facilities.push({ ...structuredClone(garden), id: 'test-shop', name: '試験用販売店', prefecture: '神奈川県', categories: ['nursery'], purposes: ['buy'] }, { ...structuredClone(garden), id: 'test-park', name: '試験用公園', categories: ['flower-park'], purposes: ['see'] });
+  data.targets.push({ ...data.targets[1], id: 'shop-agave', facility_id: 'test-shop', purposes: ['buy'] }, { ...data.targets[0], id: 'park-rose', facility_id: 'test-park' });
+  return validateCatalog(data);
+}
+test('全施設から条件を重ねて絞り、条件解除で候補が戻る', () => {
+  const data = filterFixture();
+  const filters = { plant: 'agave' };
+  assert.equal(searchCatalog(data, {}, now).length, 3);
+  assert.equal(searchCatalog(data, filters, now).length, 2);
+  filters.purposes = ['buy'];
+  assert.equal(searchCatalog(data, filters, now).length, 1);
+  filters.prefecture = '東京都';
+  assert.equal(searchCatalog(data, filters, now).length, 0);
+  filters.prefecture = '';
+  assert.equal(searchCatalog(data, filters, now).length, 1);
+  assert.equal(searchCatalog(data, {}, now).length, 3);
+});
+test('条件ごとの件数はほかの条件を保ち、植物・場所・見頃を取り違えない', () => {
+  const data = filterFixture();
+  let counts = facetCounts(data, {}, now);
+  assert.equal(counts.plant.rose, 2);
+  assert.equal(counts.plant.agave, 2);
+  assert.equal(counts.environment.indoor, 2);
+  assert.equal(counts.purposes.buy, 2);
+  counts = facetCounts(data, { plant: 'agave', prefecture: '東京都' }, now);
+  assert.equal(counts.prefecture['神奈川県'], 1);
+  assert.equal(counts.plant.rose, 2);
+  assert.equal(counts.purposes.buy, 0);
+  counts = facetCounts(data, { peak: true }, now);
+  assert.equal(counts.plant.rose, 1);
+  assert.equal(counts.plant.agave, 0);
+  assert.equal(counts.environment.greenhouse, 0);
+  assert.equal(counts.purposes.buy, 0);
 });

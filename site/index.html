@@ -15,7 +15,7 @@
 <body>
   <a class="skip-link" href="#search">検索条件へ</a>
   <header class="header">
-    <div class="brand"><h1>植物めぐりMAP</h1></div>
+    <div class="brand"><span class="brand-leaf" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><path class="leaf-stem" d="M16 27V14M16 21l-6-7M16 17l6-7"></path><path class="leaf-left" d="M15 20C5 20 3 12 5 6c8 0 13 5 10 14Z"></path><path class="leaf-right" d="M17 16C16 7 23 3 29 4c0 8-4 13-12 12Z"></path></svg></span><h1>植物めぐりMAP</h1></div>
     <nav class="network-links" aria-label="NatureWxLabの公式ホームページとSNS">
       <a class="network-link home" href="https://naturewxlab.com/" aria-label="NatureWxLab公式ホームページへ戻る" title="NatureWxLab公式ホームページへ">
         <span class="brand-home-icon" aria-hidden="true">
@@ -53,20 +53,28 @@
   </header>
   <main class="workspace">
     <aside class="sidebar" aria-label="検索と施設一覧">
+      <div class="search-summary">
+        <div class="section-heading"><h2>植物スポットを探す</h2><button id="reset-filters" type="button" class="text-button">すべて解除</button></div>
+        <div class="candidate-total" role="status" aria-live="polite" aria-atomic="true"><span>候補</span><strong id="result-count">0</strong><span>件</span><small id="total-count">登録 0件から</small></div>
+        <p id="search-guide">すべての登録施設を表示しています</p>
+        <div id="active-filters" class="active-filters" aria-label="選択中の条件。押すと個別に解除できます" hidden></div>
+      </div>
       <form id="search" autocomplete="off">
-        <div class="section-heading"><h2>植物スポットを探す</h2><button id="reset-filters" type="button" class="text-button">条件を解除</button></div>
         <label class="field">施設名・地域・キーワード<input id="query" type="search" placeholder="例：植物園、バラ、温室" maxlength="100"></label>
-        <label class="peak-switch"><input id="peak" type="checkbox"><span><strong>いま見頃あり</strong><small>植物を選ばずに探せます</small></span><span class="switch-track" aria-hidden="true"></span></label>
-        <fieldset class="purpose"><legend>目的 <span>複数選択可</span></legend><div class="purpose-options"><label><input type="checkbox" name="purpose" value="see"><span>見る</span></label><label><input type="checkbox" name="purpose" value="buy"><span>買う</span></label><label><input type="checkbox" name="purpose" value="learn"><span>学ぶ</span></label><label><input type="checkbox" name="purpose" value="experience"><span>体験</span></label><label><input type="checkbox" name="purpose" value="harvest"><span>収穫</span></label></div></fieldset>
-        <div class="field-grid"><label class="field">都道府県<select id="prefecture"><option value="">全国</option></select></label><label class="field">屋内・屋外<select id="environment"><option value="">指定なし</option><option value="outdoor">屋外</option><option value="indoor">屋内（温室を含む）</option><option value="greenhouse">温室</option></select></label></div>
-        <div class="field-grid"><label class="field">施設ジャンル<select id="category"><option value="">すべてのジャンル</option></select></label><label class="field">植物・植物グループ<select id="plant"><option value="">すべての植物</option></select></label></div>
-        <p class="filter-hint">同じ目的は「いずれか」、別の条件は「すべて一致」で絞ります。</p>
+        <label class="peak-switch"><input id="peak" type="checkbox"><span><strong>いま見頃あり <span id="peak-count" class="facet-count">0件</span></strong><small>植物を選ばずに探せます</small></span><span class="switch-track" aria-hidden="true"></span></label>
+        <fieldset class="purpose"><legend>目的 <span>複数選択可</span></legend><div class="purpose-options"><label><input type="checkbox" name="purpose" value="see"><span>見る<small id="purpose-count-see" class="facet-count">0</small></span></label><label><input type="checkbox" name="purpose" value="buy"><span>買う<small id="purpose-count-buy" class="facet-count">0</small></span></label><label><input type="checkbox" name="purpose" value="learn"><span>学ぶ<small id="purpose-count-learn" class="facet-count">0</small></span></label><label><input type="checkbox" name="purpose" value="experience"><span>体験<small id="purpose-count-experience" class="facet-count">0</small></span></label><label><input type="checkbox" name="purpose" value="harvest"><span>収穫<small id="purpose-count-harvest" class="facet-count">0</small></span></label></div></fieldset>
+        <div class="field-grid"><label class="field">都道府県<select id="prefecture"><option value="">全国</option></select></label><label class="field">植物・植物グループ<select id="plant"><option value="">すべての植物</option></select></label></div>
+        <details id="extra-filters" class="extra-filters"><summary>条件を追加：施設ジャンル・屋内外 <span id="extra-filter-count"></span></summary>
+          <label class="field">施設ジャンル<select id="category"><option value="">すべてのジャンル</option></select></label>
+          <label class="field">屋内・屋外<select id="environment"><option value="">指定なし</option><option value="outdoor">屋外</option><option value="indoor">屋内（温室を含む）</option><option value="greenhouse">温室</option></select></label>
+        </details>
+        <p class="filter-hint">数字は、ほかの条件に合う施設数。目的はどれかに一致します。</p>
       </form>
-      <section class="results" aria-labelledby="result-heading"><div class="result-header"><h2 id="result-heading">施設一覧 <span id="result-count">0</span><small>件</small></h2><span id="conditions">全スポット</span></div><div id="result-list" aria-live="polite"><p>データを読み込んでいます。</p></div></section>
+      <section class="results" aria-labelledby="result-heading"><div class="result-header"><h2 id="result-heading">候補の施設</h2><span id="conditions">全スポット</span></div><div id="result-list" aria-live="polite"><p>データを読み込んでいます。</p></div></section>
       <div class="data-status"><span class="status-dot" aria-hidden="true"></span><span id="data-status">公開データを確認中</span></div>
     </aside>
     <section class="map-section" aria-label="全国の植物スポット地図">
-      <div class="map-frame"><div id="map" aria-label="地図。矢印キーで移動し、プラス・マイナスで拡大縮小できます"></div><div id="map-message" class="map-message" role="status">施設データを準備しています</div><div id="map-error" class="map-error" role="status" hidden>背景地図の一部を取得できません。施設一覧は利用できます。</div></div>
+      <div class="map-frame"><div id="map" aria-label="地図。ドラッグや矢印キーで移動し、ホイールやプラス・マイナスで拡大縮小できます"></div><div id="map-message" class="map-message" role="status">施設データを準備しています</div><div id="map-error" class="map-error" role="status" hidden>背景地図の一部を取得できません。施設一覧は利用できます。</div></div>
       <div class="map-footer"><span class="legend"><i aria-hidden="true"></i>施設 <i class="peak-color" aria-hidden="true"></i>見頃・注目の開花</span><details class="map-attribution"><summary>地図の出典・通信について</summary><p>背景地図：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">地理院タイル（淡色地図）</a>。地図画像は国土地理院の配信先から読み込みます。配信先へIPアドレスや表示範囲に対応するタイル番号が伝わります。「地図通信を停止」で背景地図の読み込みを止められます。</p><p lang="en">Shoreline data is derived from: United States. National Imagery and Mapping Agency. "Vector Map Level 0 (VMAP0)." Bethesda, MD: Denver, CO: The Agency; USGS Information Services, 1997.</p></details></div>
     </section>
   </main>

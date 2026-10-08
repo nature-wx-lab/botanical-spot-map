@@ -65,3 +65,27 @@ export function searchCatalog(data, filters = {}, now = Date.now()) {
     return [{ facility: f, targets: matchedTargets, observations: records }];
   });
 }
+
+// Count each facet with the other conditions retained, so users can see
+// what is available before choosing or changing that condition.
+export function facetCounts(data, filters = {}, now = Date.now()) {
+  const counts = {
+    prefecture: Object.fromEntries(PREFECTURES.map(p => [p, 0])),
+    category: Object.fromEntries(data.categories.map(c => [c.id, 0])),
+    plant: Object.fromEntries(data.plants.map(p => [p.id, 0])),
+    environment: Object.fromEntries(Object.keys(ENVIRONMENTS).map(e => [e, 0])),
+    purposes: Object.fromEntries(Object.keys(PURPOSES).map(p => [p, searchCatalog(data, { ...filters, purposes: [p] }, now).length])),
+    peak: searchCatalog(data, { ...filters, peak: true }, now).length,
+  };
+  for (const { facility } of searchCatalog(data, { ...filters, prefecture: '' }, now)) counts.prefecture[facility.prefecture]++;
+  for (const { facility } of searchCatalog(data, { ...filters, category: '' }, now)) for (const id of facility.categories) counts.category[id]++;
+  for (const facet of ['plant', 'environment']) {
+    for (const result of searchCatalog(data, { ...filters, [facet]: '' }, now)) {
+      const currentIds = new Set(result.observations.map(o => o.target_id));
+      const targets = result.targets.filter(t => !filters.peak || currentIds.has(t.id));
+      const values = new Set(targets.flatMap(t => facet === 'plant' ? [t.plant_id] : t.environment === 'greenhouse' ? ['greenhouse', 'indoor'] : [t.environment]));
+      for (const value of values) counts[facet][value]++;
+    }
+  }
+  return counts;
+}
