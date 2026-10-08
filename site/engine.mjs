@@ -1,5 +1,5 @@
 export const PURPOSES = { see: '見る', buy: '買う', learn: '学ぶ', experience: '体験', harvest: '収穫' };
-export const ENVIRONMENTS = { outdoor: '屋外', indoor: '屋内', greenhouse: '温室' };
+export const ENVIRONMENTS = { outdoor: '屋外', indoor: '屋内', greenhouse: '温室', unknown: '屋内外未確認' };
 export const PREFECTURES = '北海道 青森県 岩手県 宮城県 秋田県 山形県 福島県 茨城県 栃木県 群馬県 埼玉県 千葉県 東京都 神奈川県 新潟県 富山県 石川県 福井県 山梨県 長野県 岐阜県 静岡県 愛知県 三重県 滋賀県 京都府 大阪府 兵庫県 奈良県 和歌山県 鳥取県 島根県 岡山県 広島県 山口県 徳島県 香川県 愛媛県 高知県 福岡県 佐賀県 長崎県 熊本県 大分県 宮崎県 鹿児島県 沖縄県'.split(' ');
 export function safeUrl(value) {
   try { const u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password && !u.port && !/^(localhost|127\.|\[|0\.)/.test(u.hostname) && u.hostname.includes('.') ? u.href : null; } catch { return null; }
@@ -22,7 +22,9 @@ export function validateCatalog(data) {
   const facilities = unique(data.facilities, '施設'), targets = unique(data.targets, '対象');
   unique(data.observations, '現地情報');
   unique(data.seasonal_calendars, '例年の見頃');
-  for (const list of [data.forecasts, data.events]) if (!Array.isArray(list) || list.length) fail('未対応の時期情報です');
+  const events = unique(data.events, 'イベント');
+  if (!Array.isArray(data.forecasts) || data.forecasts.length) fail('未対応の予想情報です');
+  if (data.facilities.some(f => f.location?.source_url?.startsWith('https://www.openstreetmap.org/')) && (data.data_license?.url !== 'https://opendatacommons.org/licenses/odbl/1-0/' || !data.data_license?.attribution?.includes('OpenStreetMap contributors'))) fail('施設位置の出典・ライセンス表示が必要です');
   for (const entry of [...data.categories, ...data.plants]) if (typeof entry.name !== 'string' || !entry.name.trim()) fail('名称が必要です');
   for (const f of data.facilities) {
     if (typeof f.name !== 'string' || !f.name.trim() || !PREFECTURES.includes(f.prefecture) || typeof f.city !== 'string') fail('施設の基本情報が不正です');
@@ -39,6 +41,10 @@ export function validateCatalog(data) {
     if (!facilities.has(t.facility_id) || !plants.has(t.plant_id) || typeof t.area !== 'string' || !t.area.trim() || !ENVIRONMENTS[t.environment] || !Array.isArray(t.purposes) || !t.purposes.length || t.purposes.some(p => !PURPOSES[p])) fail('植物・場所・目的の関係が不正です');
     const f = data.facilities.find(f => f.id === t.facility_id);
     if (t.purposes.some(p => !f.purposes.includes(p))) fail('施設と対象の目的が矛盾しています');
+    if (t.event_id !== undefined && (!events.has(t.event_id) || data.events.find(e => e.id === t.event_id).facility_id !== t.facility_id)) fail('イベントと植物の関係が不正です');
+  }
+  for (const e of data.events) {
+    if (!facilities.has(e.facility_id) || ![e.name, e.venue, e.schedule_note, e.admission_note].every(s => typeof s === 'string' && s.trim() && s.length <= 200) || ![e.starts_at, e.ends_at, e.checked_at].every(validDate) || Date.parse(e.ends_at) <= Date.parse(e.starts_at) || !safeUrl(e.source_url) || e.reviewed !== true || typeof e.cancelled !== 'boolean') fail('イベントの会場・日時・確認が不正です');
   }
   for (const o of data.observations) {
     if (!targets.has(o.target_id) || !['peak', 'flowering', 'starting', 'ending', 'ended', 'unknown'].includes(o.status) || ![null, 'seasonal-peak', 'notable-flowering'].includes(o.inclusion_reason)) fail('現地情報の関係・状態が不正です');
@@ -54,6 +60,11 @@ export function validateCatalog(data) {
 export function currentObservations(data, now = Date.now()) {
   return data.observations.filter(o => o.reviewed && o.viewable && !o.withdrawn && Date.parse(o.observed_at) <= now && Date.parse(o.published_at) <= now && Date.parse(o.valid_from) <= now && now < Date.parse(o.valid_until) && ((o.status === 'peak' && o.inclusion_reason === 'seasonal-peak') || (o.status === 'flowering' && o.inclusion_reason === 'notable-flowering')));
 }
+export function eventStatus(event, now = Date.now()) {
+  if (event.cancelled) return 'cancelled';
+  if (now < Date.parse(event.starts_at)) return 'scheduled';
+  return now < Date.parse(event.ends_at) ? 'active' : 'ended';
+}
 const matchesEnvironment = (actual, filter) => !filter || actual === filter || (filter === 'indoor' && actual === 'greenhouse');
 export function searchCatalog(data, filters = {}, now = Date.now()) {
   const query = (filters.query || '').normalize('NFKC').trim().toLocaleLowerCase('ja');
@@ -63,7 +74,7 @@ export function searchCatalog(data, filters = {}, now = Date.now()) {
     if (filters.prefecture && f.prefecture !== filters.prefecture) return [];
     if (filters.category && !f.categories.includes(filters.category)) return [];
     if (purposes.length && !purposes.some(p => f.purposes.includes(p))) return [];
-    const allTargets = data.targets.filter(t => t.facility_id === f.id);
+    const allTargets = data.targets.filter(t => t.facility_id === f.id && (!t.event_id || ['scheduled', 'active'].includes(eventStatus(data.events.find(e => e.id === t.event_id), now))));
     const matchedTargets = allTargets.filter(t => (!filters.plant || t.plant_id === filters.plant) && matchesEnvironment(t.environment, filters.environment) && (!purposes.length || purposes.some(p => t.purposes.includes(p))));
     const records = current.filter(o => matchedTargets.some(t => t.id === o.target_id));
     if (filters.peak && !records.length) return [];

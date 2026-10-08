@@ -183,3 +183,24 @@ dialog{background:#fffef8;border-color:#b9cbac;box-shadow:0 12px 48px #15342633}
 .spot-detail .facility-info p,.spot-detail .facility-info li,.spot-detail .season-periods{font-size:11px}
 .spot-detail .facility-genres span{font-size:9px}
 @media(max-width:700px){.botanical-popup a.leaflet-popup-close-button{width:36px;height:36px}.facility-heading h3{font-size:16px}.botanical-popup .leaflet-popup-content{margin:12px}.facility-info section{padding:8px 0}.leaflet-container:has(.botanical-popup) .leaflet-control-zoom{visibility:hidden}}
+
+/* Distinct silhouettes and restrained botanical colors work at every zoom. */
+.genre-icon.tone-petal{color:#875476;border-color:#986e89;background:#fff8fc}
+.genre-icon.tone-water{color:#326c78;border-color:#59868e;background:#f3fbfb}
+.genre-icon.tone-earth{color:#8b6639;border-color:#9a7b52;background:#fff9ed}
+.genre-icon.has-peak{color:#976426;border-color:#b77835;background:#fff6e6}
+.spot-card>button{display:flex;align-items:center;gap:8px;width:100%;line-height:1.5;padding:3px 0}
+.spot-card>button .genre-icon{width:30px;height:30px;box-shadow:none;border-width:1.5px}
+.spot-card>button .genre-icon svg{width:21px;height:21px}
+.spot-card>button:hover>span:last-child{text-decoration:underline;text-underline-offset:3px}
+.spot-card .spot-genre{font-size:10px;color:#75846a}
+.event-badge{background:#f2e8ef;border:1px solid #d9c3d1;border-radius:5px;color:#7b526e!important;padding:5px 7px;font-size:11px!important;line-height:1.6}
+.event-active{background:#e7efdb;border-color:#bfcca9;color:#476735!important}
+.event-ended,.event-cancelled{background:#eeeee7;border-color:#d5d6cd;color:#75786d!important}
+.genre-guide{font-size:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 0}
+.genre-guide>summary{cursor:pointer;min-height:28px;color:#486943}
+.genre-key{list-style:none;padding:0;margin:10px 0;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.genre-key li{display:flex;align-items:center;gap:8px;font-size:11px;line-height:1.6}
+.genre-key .genre-icon{width:30px;height:30px;box-shadow:none;border-width:1.5px}
+.genre-key .genre-icon svg{width:21px;height:21px}
+@media(max-width:450px){.genre-key{grid-template-columns:1fr}.leaflet-control-attribution{max-width:100%;font-size:9px!important}.map-message{max-width:calc(100% - 90px)}}

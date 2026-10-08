@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validateCatalog, searchCatalog, safeUrl, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan } from '../site/engine.mjs';
+import { validateCatalog, searchCatalog, safeUrl, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan, eventStatus } from '../site/engine.mjs';
 const now = Date.parse('2026-10-08T12:00:00+09:00');
 function fixture() {
   const data = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
   data.mode = 'manual';
   data.seasonal_calendars = [];
+  data.events = [];
   const url = 'https://example.org/';
   const stamp = '2026-10-08T09:00:00+09:00';
   data.facilities = [{ id: 'test-garden', name: '試験用施設', city: '試験', prefecture: '東京都', categories: ['botanical-garden'], purposes: ['see', 'buy'], public_access: true, official_url: url, verified_at: stamp, location: { lat: 35, lon: 139, source_url: url, verified_at: stamp, precision: 'site-reference' }, sources: [{ url, checked_at: stamp, use_basis: 'independently-verified-facts' }] }];
@@ -22,8 +23,8 @@ test('実在する京成バラ園を初期表示・複合条件で検索し、�
   assert.deepEqual(record.location, { lat: 35.731118, lon: 140.086538, source_url: 'https://maruchiba.jp/spot/detail_10078.html', verified_at: record.verified_at, precision: 'site-reference' });
   assert.equal(searchCatalog(data, {}, now).length, data.facilities.length);
   assert.equal(searchCatalog(data, { query: '京成', prefecture: '千葉県', plant: 'rose', purposes: ['see'], environment: 'outdoor' }, now)[0].facility.id, record.id);
-  assert.equal(searchCatalog(data, { plant: 'agave' }, now).length, 0);
-  assert.equal(searchCatalog(data, { prefecture: '東京都' }, now).length, 0);
+  assert.equal(searchCatalog(data, { query: '京成', plant: 'agave' }, now).length, 0);
+  assert.equal(searchCatalog(data, { query: '京成', prefecture: '東京都' }, now).length, 0);
   assert.equal(searchCatalog(data, { peak: true }, now).length, 0);
 });
 test('植物未選択で見頃検索でき、複数見頃を施設として重複計数しない', () => {
@@ -124,4 +125,37 @@ test('密集する地図ラベルは優先順で間引き、画面端では内�
   assert.deepEqual(mapMarkerPlan(points, 5, { x: 1000, y: 500 }, 'regular'), ['regular']);
   assert.equal(mapLabelPlan([{ ...points[1], x: 950 }], 12, { x: 1000, y: 500 })[0].direction, 'left');
   assert.equal(mapLabelPlan([{ ...points[1], x: -10 }], 12, { x: 1000, y: 500 }).length, 0);
+});
+
+test('21ジャンルの代表を全件表示し、実在の専門店・農園を複合条件で絞り込める', () => {
+  const data = validateCatalog(JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url))));
+  assert.equal(data.facilities.length, 21);
+  assert.deepEqual(new Set(data.facilities.map(f => f.categories[0])), new Set(data.categories.map(c => c.id)));
+  assert.equal(searchCatalog(data, { category: 'aquatic-plants', plant: 'aquatic', purposes: ['buy'], environment: 'indoor' }, now)[0].facility.id, 'aquaforest-solamachi');
+  assert.equal(searchCatalog(data, { category: 'allotment', prefecture: '東京都', purposes: ['harvest'], plant: 'vegetables' }, now)[0].facility.id, 'sharebatake-yukigayaotsuka');
+  assert.equal(searchCatalog(data, { category: 'picking-farm', plant: 'strawberry', environment: 'greenhouse' }, now)[0].facility.id, 'isoyama-strawberry-farm');
+  assert.equal(searchCatalog(data, { query: 'プロトリーフ', plant: 'agave' }, now).length, 1);
+  assert.equal(searchCatalog(data, { query: 'プロトリーフ', plant: 'agave', environment: 'indoor' }, now).length, 0);
+});
+test('イベントの開始・終了・中止を判定し、終了後の展示対象を通常検索へ残さない', () => {
+  const data = validateCatalog(JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url))));
+  const event = data.events[0], start = Date.parse(event.starts_at), end = Date.parse(event.ends_at);
+  assert.equal(eventStatus(event, start - 1), 'scheduled');
+  assert.equal(eventStatus(event, start), 'active');
+  assert.equal(eventStatus(event, end - 1), 'active');
+  assert.equal(eventStatus(event, end), 'ended');
+  assert.equal(eventStatus({ ...event, cancelled: true }, start), 'cancelled');
+  assert.equal(searchCatalog(data, { category: 'plant-event', plant: 'bonsai' }, start).length, 1);
+  assert.equal(searchCatalog(data, { category: 'plant-event', plant: 'bonsai' }, end).length, 0);
+  assert.equal(facetCounts(data, { category: 'plant-event' }, end).plant.bonsai, 0);
+  assert.equal(searchCatalog(data, { category: 'plant-event' }, end).length, 1);
+  assert.equal(searchCatalog(data, { category: 'plant-event', peak: true }, start).length, 0);
+  data.events[0].cancelled = true;
+  assert.equal(searchCatalog(data, { category: 'plant-event', plant: 'bonsai' }, start).length, 0);
+});
+test('イベントの未確認・不正日時・別施設参照と位置のライセンス欠落で公開を止める', () => {
+  const published = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
+  for (const change of [d => d.events[0].reviewed = false, d => d.events[0].ends_at = d.events[0].starts_at, d => d.events[0].source_url = 'javascript:alert(1)', d => d.events[0].facility_id = 'missing', d => d.targets.at(-1).event_id = 'missing', d => d.events[0].facility_id = 'rikugien', d => delete d.data_license]) {
+    const data = structuredClone(published); change(data); assert.throws(() => validateCatalog(data));
+  }
 });

@@ -1,4 +1,4 @@
-import { PURPOSES, ENVIRONMENTS, PREFECTURES, safeUrl, validateCatalog, searchCatalog, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan } from './engine.mjs';
+import { PURPOSES, ENVIRONMENTS, PREFECTURES, safeUrl, validateCatalog, searchCatalog, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan, eventStatus } from './engine.mjs';
 const $ = id => document.getElementById(id);
 const node = (tag, text, className) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (className) e.className = className; return e; };
 const option = (value, text) => { const e = node('option', text); e.value = value; return e; };
@@ -56,26 +56,42 @@ function updateFilterUI(f, count, now) {
 }
 function officialLink(url, label) { const e = node('a', label); const href = safeUrl(url); if (href) { e.href = href; e.target = '_blank'; e.rel = 'noopener noreferrer'; } return e; }
 const dateLabel = value => new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'numeric', day: 'numeric' }).format(new Date(value));
+// Neutral pictograms describe each genre; they are not facility logos.
 const iconPaths = {
-  flower: ['M12 8C7 1 1 7 8 12C1 17 7 23 12 16C17 23 23 17 16 12C23 7 17 1 12 8Z', 'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6'],
-  leaf: ['M5 19C0 6 10 3 20 4C21 14 15 21 5 19Z', 'M5 19L16 8M10 14L9 9M13 11L18 12'],
-  tree: ['M12 2L5 10H8L3 16H10V22H14V16H21L16 10H19Z'],
-  shop: ['M4 10V21H20V10M3 4H21L20 10H4ZM9 21V14H15V21M8 4L7 10M16 4L17 10'],
-  book: ['M12 6C8 3 4 3 2 4V19C6 18 9 19 12 21C15 19 18 18 22 19V4C19 3 16 3 12 6ZM12 6V21'],
-  fruit: ['M12 7C4 2 1 12 7 20C10 23 12 20 12 20C12 20 14 23 17 20C23 12 20 2 12 7ZM12 7V3M12 4C14 1 17 1 19 2C18 5 15 6 12 4'],
-  trail: ['M2 20L10 5L16 16L19 11L23 20ZM7 10L10 12L12 9'],
-  water: ['M12 2C10 6 4 11 4 16A8 8 0 0 0 20 16C20 11 14 6 12 2ZM8 15C7 18 10 20 12 20'],
-  cup: ['M3 8H17V15A7 7 0 0 1 3 15ZM17 9H20A3 3 0 0 1 20 15H17M2 22H19M7 2V5M13 2V5'],
-  event: ['M3 5H21V22H3ZM3 10H21M7 2V7M17 2V7M7 14H10M14 14H17M7 18H10'],
+  'botanical-garden': ['M3 10L12 3L21 10V21H3ZM12 3V21M3 10H21M3 16H21M8 10V21M16 10V21'],
+  'flower-park': ['M12 8C7 1 1 7 8 12C1 17 7 23 12 16C17 23 23 17 16 12C23 7 17 1 12 8Z', 'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6'],
+  garden: ['M3 16C6 8 18 8 21 16M3 16H21M5 12V17M10 10V16M14 10V16M19 12V17M2 20Q5 18 8 20T14 20T22 20'],
+  'cultural-garden': ['M2 5Q12 8 22 5M4 10H20M7 7L6 22M17 7L18 22M3 22H9M15 22H21'],
+  urban: ['M3 21V7H9V21M9 21V3H15V21M2 21H22M17 18V12M17 14C14 14 13 10 14 8C18 8 19 12 17 14M17 12C18 8 21 8 22 9C22 12 20 14 17 14'],
+  'heritage-tree': ['M9 21L10 14M15 21L14 14M8 21H16M8 15C1 15 1 9 5 7C5 2 12 1 14 5C20 2 24 10 20 13C19 17 15 17 12 15C11 17 8 16 8 15Z'],
+  'garden-center': ['M3 9H21L19 3H5ZM4 9V21H20V9M4 14H20M12 21V11M12 17C7 17 7 13 8 12C12 12 14 15 12 17M12 16C12 12 16 11 18 12C18 15 15 17 12 16'],
+  'specialist-houseplants': ['M7 17H17L16 22H8ZM12 17V7M12 12C4 13 2 8 5 3C11 2 15 7 12 12ZM12 11C12 4 17 2 21 4C23 9 18 14 12 11M7 5L9 8M17 6L16 9'],
+  'specialist-bonsai': ['M5 18H19L17 22H7ZM12 18C6 14 15 13 12 8M4 9C1 5 7 2 10 5C11 1 17 2 17 5C23 3 23 9 19 10C16 12 13 10 11 10C8 12 4 11 4 9Z'],
+  nursery: ['M5 3H19V22H5ZM5 7H19M12 18V12M12 14C7 15 7 10 8 9C12 9 14 12 12 14M12 13C13 9 16 8 18 9C18 12 15 14 12 13M9 19H15'],
+  florist: ['M5 12L9 22H15L19 12L12 16ZM6 12L10 20M18 12L14 20M12 16V9M7 4L5 6L7 8L9 6ZM17 4L15 6L17 8L19 6ZM12 1L9 4L12 7L15 4ZM7 8L10 15M17 8L14 15'],
+  'garden-supplies': ['M2 11H14V14H2ZM3 14L5 22H11L13 14M8 11V5M8 7C3 7 3 3 4 2C8 2 10 5 8 7M18 3H21V10L19.5 13L18 10ZM19.5 13V22'],
+  'farm-market': ['M3 10H21L19 22H5ZM2 10H22M6 10L10 4M18 10L14 4M8 14V18M12 14V19M16 14V18M10 4C10 1 14 1 14 4'],
+  'aquatic-plants': ['M2 4H22V21H2ZM2 9Q5 7 8 9T14 9T22 9M12 21V12M12 17C6 17 6 12 7 11C11 11 13 15 12 17M12 15C14 11 18 11 19 12C19 16 15 18 12 17M5 18H6M18 6H19'],
+  learning: ['M12 6C8 3 4 3 2 4V20C6 19 9 20 12 22C15 20 18 19 22 20V4C19 3 16 3 12 6ZM12 6V22M15 16C13 8 17 6 20 7C21 12 19 16 15 16ZM15 16L19 10'],
+  workshop: ['M10 14H20L18 22H12ZM15 14V8M15 10C10 10 10 5 11 4C15 4 17 8 15 10M15 8C15 3 19 2 21 3C22 7 18 10 15 8M3 3H6V10L4.5 13L3 10ZM4.5 13V22'],
+  'picking-farm': ['M5 8C0 13 8 22 12 22C16 22 24 13 19 8ZM12 8L8 3L12 4L16 2L15 6L20 7L16 9M12 4V2M8 12H8.1M15 12H15.1M11 16H11.1M16 17H16.1'],
+  allotment: ['M2 17L8 14L14 17L20 14L22 15M2 22L8 19L14 22L20 19L22 20M12 13V6M12 8C6 8 5 4 6 2C11 2 14 5 12 8M12 7C14 2 18 2 20 3C20 7 16 10 12 7'],
+  'garden-cafe': ['M3 9H17V15A7 7 0 0 1 3 15ZM17 10H20A3 3 0 0 1 20 16H17M2 22H19M10 7C5 7 5 3 6 2C10 2 13 4 10 7ZM10 7L8 4'],
+  'nature-trail': ['M3 22C18 15 5 13 14 7M14 8C10 2 16 1 21 2C22 8 17 11 14 8ZM14 8L18 4M4 14C0 9 2 5 7 4C11 9 9 14 4 14ZM4 14L5 8'],
+  'plant-event': ['M3 5H21V22H3ZM3 10H21M7 2V7M17 2V7M12 14L9 12L8 15L10 17L10 20L13 19L16 20L16 17L18 15L15 13L12 14Z'],
 };
+const genreTone = category => ['flower-park', 'florist', 'plant-event'].includes(category) ? 'petal' : category === 'aquatic-plants' ? 'water' : ['garden-supplies', 'nursery', 'farm-market', 'picking-farm', 'garden-cafe'].includes(category) ? 'earth' : 'forest';
 function genreIcon(f) {
   const category = f.categories[0];
-  const kind = category === 'flower-park' || category === 'florist' ? 'flower' : category === 'heritage-tree' || category === 'specialist-bonsai' ? 'tree' : category === 'learning' || category === 'workshop' ? 'book' : category === 'picking-farm' || category === 'allotment' ? 'fruit' : category === 'aquatic-plants' ? 'water' : category === 'garden-cafe' ? 'cup' : category === 'plant-event' ? 'event' : category === 'nature-trail' ? 'trail' : ['garden-center', 'specialist-houseplants', 'nursery', 'garden-supplies', 'farm-market'].includes(category) ? 'shop' : 'leaf';
-  const icon = node('span', undefined, 'genre-icon'); icon.title = catalog.categories.find(c => c.id === category).name;
+  const icon = node('span', undefined, `genre-icon tone-${genreTone(category)}`); icon.title = catalog.categories.find(c => c.id === category).name; icon.dataset.genre = category;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
-  for (const d of iconPaths[kind]) { const path = document.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', d); svg.append(path); }
+  for (const d of iconPaths[category]) { const path = document.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', d); svg.append(path); }
   icon.append(svg); return icon;
+}
+const eventLabels = { scheduled: '開催予定', active: '開催期間中', ended: '終了', cancelled: '中止' };
+function appendEventBadges(root, f) {
+  for (const event of catalog.events.filter(e => e.facility_id === f.id)) root.append(node('p', `${eventLabels[eventStatus(event)]} · ${event.name} · ${event.schedule_note}`, `event-badge event-${eventStatus(event)}`));
 }
 function infoSection(root, heading) { const section = node('section'); section.append(node('h4', heading)); root.append(section); return section; }
 function facilityDetails(f) {
@@ -83,6 +99,11 @@ function facilityDetails(f) {
   const tags = node('div', undefined, 'facility-genres');
   for (const id of f.categories) tags.append(node('span', catalog.categories.find(c => c.id === id).name));
   root.append(tags);
+  for (const event of catalog.events.filter(e => e.facility_id === f.id)) {
+    const section = infoSection(root, '期間限定イベント');
+    section.append(node('p', `${eventLabels[eventStatus(event)]} · ${event.name} · ${event.schedule_note}`, `event-badge event-${eventStatus(event)}`));
+    section.append(node('p', `${event.venue} · ${event.admission_note}`), officialLink(event.source_url, 'イベントの公式案内'), node('p', `${dateLabel(event.checked_at)}確認。開催変更は公式案内をご確認ください。開催期間中の表示は、当日の営業中を示すものではありません。`, 'info-note'));
+  }
   if (f.features?.length) {
     const section = infoSection(root, 'この施設の特徴'), list = node('ul');
     for (const feature of f.features) list.append(node('li', feature)); section.append(list);
@@ -152,14 +173,16 @@ function card(result) {
   const { facility: f, observations, targets } = result;
   const e = node('article', undefined, 'spot-card');
   const details = node('details', undefined, 'spot-detail'); details.append(node('summary', '施設情報・見頃・出典を確認'));
-  const title = node('button', f.name); title.type = 'button'; title.addEventListener('click', () => {
+  const title = node('button'); title.append(genreIcon(f), node('span', f.name)); title.type = 'button'; title.addEventListener('click', () => {
     if (!map) return;
     if (window.matchMedia('(max-width:700px)').matches) document.querySelector('.workspace').scrollTop = 0;
     map.setView([f.location.lat, f.location.lon], Math.max(map.getZoom(), 13), { animate: false });
     mapMarkers.find(item => item.facility.id === f.id)?.marker.openPopup();
   });
   e.append(title, node('p', `${f.prefecture} ${f.city} · ${f.purposes.map(p => PURPOSES[p]).join('・')}`));
+  e.append(node('p', catalog.categories.find(c => c.id === f.categories[0]).name, 'spot-genre'));
   if (f.summary) e.append(node('p', f.summary, 'spot-summary'));
+  appendEventBadges(e, f);
   for (const o of observations) {
     const t = targets.find(t => t.id === o.target_id), p = catalog.plants.find(p => p.id === t.plant_id);
     e.append(node('p', `${p.name} · ${o.status === 'peak' ? '見頃' : '注目の開花'} · ${ENVIRONMENTS[t.environment]}／${t.area}`, 'spot-status'));
@@ -223,6 +246,9 @@ try {
   catalog = validateCatalog(await response.json());
   for (const c of catalog.categories) $('category').append(option(c.id, c.name));
   for (const p of catalog.plants) $('plant').append(option(p.id, p.name));
+  const key = $('genre-key');
+  for (const category of catalog.categories) { const item = node('li'); item.append(genreIcon({ categories: [category.id] }), node('span', category.name)); key.append(item); }
+  if (catalog.facilities.some(f => f.location.source_url.startsWith('https://www.openstreetmap.org/'))) map?.attributionControl.addAttribution('施設位置の一部 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>');
   render();
   refreshTimer = setInterval(render, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });

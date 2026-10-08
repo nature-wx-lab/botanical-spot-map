@@ -1,38 +1,174 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-08T12:33:29Z",
+  "generated_at": "2026-10-08T13:31:00Z",
   "mode": "manual",
   "categories": [
-    {"id":"botanical-garden","name":"植物園・温室・樹木園"},
-    {"id":"flower-park","name":"花の名所・フラワーパーク"},
-    {"id":"garden","name":"日本庭園・洋風庭園"},
-    {"id":"cultural-garden","name":"寺社・文化施設の植物スポット"},
-    {"id":"urban","name":"街なかの植物スポット"},
-    {"id":"heritage-tree","name":"巨樹・古木・名木"},
-    {"id":"garden-center","name":"園芸店・ガーデンセンター"},
-    {"id":"specialist-houseplants","name":"観葉植物・珍奇植物の専門店"},
-    {"id":"specialist-bonsai","name":"盆栽・山野草・蘭・苔の専門店"},
-    {"id":"nursery","name":"種苗店・生産者直売所"},
-    {"id":"florist","name":"花屋・フラワーショップ"},
-    {"id":"garden-supplies","name":"園芸資材・植木鉢の店"},
-    {"id":"farm-market","name":"道の駅・JA直売所・花木センター"},
-    {"id":"aquatic-plants","name":"水草・ビオトープ関連店"},
-    {"id":"learning","name":"植物を学ぶ施設"},
-    {"id":"workshop","name":"園芸教室・体験工房"},
-    {"id":"picking-farm","name":"観光農園・果樹園・花摘み園"},
-    {"id":"allotment","name":"貸農園・体験農園"},
-    {"id":"garden-cafe","name":"植物を楽しむカフェ・宿泊施設"},
-    {"id":"nature-trail","name":"自然の植物観察スポット"},
-    {"id":"plant-event","name":"期間限定の植物イベント"}
+    {
+      "id": "botanical-garden",
+      "name": "植物園・温室・樹木園"
+    },
+    {
+      "id": "flower-park",
+      "name": "花の名所・フラワーパーク"
+    },
+    {
+      "id": "garden",
+      "name": "日本庭園・洋風庭園"
+    },
+    {
+      "id": "cultural-garden",
+      "name": "寺社・文化施設の植物スポット"
+    },
+    {
+      "id": "urban",
+      "name": "街なかの植物スポット"
+    },
+    {
+      "id": "heritage-tree",
+      "name": "巨樹・古木・名木"
+    },
+    {
+      "id": "garden-center",
+      "name": "園芸店・ガーデンセンター"
+    },
+    {
+      "id": "specialist-houseplants",
+      "name": "観葉植物・珍奇植物の専門店"
+    },
+    {
+      "id": "specialist-bonsai",
+      "name": "盆栽・山野草・蘭・苔の専門店"
+    },
+    {
+      "id": "nursery",
+      "name": "種苗店・生産者直売所"
+    },
+    {
+      "id": "florist",
+      "name": "花屋・フラワーショップ"
+    },
+    {
+      "id": "garden-supplies",
+      "name": "園芸資材・植木鉢の店"
+    },
+    {
+      "id": "farm-market",
+      "name": "道の駅・JA直売所・花木センター"
+    },
+    {
+      "id": "aquatic-plants",
+      "name": "水草・ビオトープ関連店"
+    },
+    {
+      "id": "learning",
+      "name": "植物を学ぶ施設"
+    },
+    {
+      "id": "workshop",
+      "name": "園芸教室・体験工房"
+    },
+    {
+      "id": "picking-farm",
+      "name": "観光農園・果樹園・花摘み園"
+    },
+    {
+      "id": "allotment",
+      "name": "貸農園・体験農園"
+    },
+    {
+      "id": "garden-cafe",
+      "name": "植物を楽しむカフェ・宿泊施設"
+    },
+    {
+      "id": "nature-trail",
+      "name": "自然の植物観察スポット"
+    },
+    {
+      "id": "plant-event",
+      "name": "期間限定の植物イベント"
+    }
   ],
   "plants": [
-    {"id":"rose","name":"バラ"}, {"id":"cosmos","name":"コスモス"},
-    {"id":"dahlia","name":"ダリア"}, {"id":"hydrangea","name":"アジサイ"},
-    {"id":"cherry","name":"サクラ"}, {"id":"maple","name":"モミジ・紅葉"},
-    {"id":"orchid","name":"ラン"}, {"id":"succulents","name":"多肉植物・サボテン"},
-    {"id":"agave","name":"アガベ"}, {"id":"houseplants","name":"観葉植物"},
-    {"id":"bonsai","name":"盆栽"}, {"id":"moss","name":"コケ"},
-    {"id":"herbs","name":"ハーブ"}, {"id":"aquatic","name":"水草・水生植物"}
+    {
+      "id": "rose",
+      "name": "バラ"
+    },
+    {
+      "id": "cosmos",
+      "name": "コスモス"
+    },
+    {
+      "id": "dahlia",
+      "name": "ダリア"
+    },
+    {
+      "id": "hydrangea",
+      "name": "アジサイ"
+    },
+    {
+      "id": "cherry",
+      "name": "サクラ"
+    },
+    {
+      "id": "maple",
+      "name": "モミジ・紅葉"
+    },
+    {
+      "id": "orchid",
+      "name": "ラン"
+    },
+    {
+      "id": "succulents",
+      "name": "多肉植物・サボテン"
+    },
+    {
+      "id": "agave",
+      "name": "アガベ"
+    },
+    {
+      "id": "houseplants",
+      "name": "観葉植物"
+    },
+    {
+      "id": "bonsai",
+      "name": "盆栽"
+    },
+    {
+      "id": "moss",
+      "name": "コケ"
+    },
+    {
+      "id": "herbs",
+      "name": "ハーブ"
+    },
+    {
+      "id": "aquatic",
+      "name": "水草・水生植物"
+    },
+    {
+      "id": "ginkgo",
+      "name": "イチョウ"
+    },
+    {
+      "id": "vegetables",
+      "name": "野菜"
+    },
+    {
+      "id": "strawberry",
+      "name": "イチゴ"
+    },
+    {
+      "id": "seasonal-flowers",
+      "name": "季節の草花"
+    },
+    {
+      "id": "trees",
+      "name": "樹木"
+    },
+    {
+      "id": "cut-flowers",
+      "name": "切り花"
+    }
   ],
   "facilities": [
     {
@@ -45,11 +181,19 @@
         "屋外のローズガーデンで、春と秋にバラの観賞を楽しめます。",
         "園芸用品のガーデンセンター、ギフトショップ、カフェ・レストランを併設。"
       ],
-      "aliases": ["けいせいばらえん", "Keisei Rose Garden"],
+      "aliases": [
+        "けいせいばらえん",
+        "Keisei Rose Garden"
+      ],
       "prefecture": "千葉県",
       "city": "八千代市",
-      "categories": ["flower-park", "garden"],
-      "purposes": ["see"],
+      "categories": [
+        "flower-park",
+        "garden"
+      ],
+      "purposes": [
+        "see"
+      ],
       "public_access": true,
       "official_url": "https://www.keiseirose.co.jp/garden/",
       "verified_at": "2026-10-08T12:25:57Z",
@@ -62,15 +206,1218 @@
       },
       "access_note": "千葉県八千代市大和田新田755。八千代緑が丘駅から徒歩約15分。ローズガーデンは有料です。営業時間・入園料は季節やイベントで変わるため、公式案内をご確認ください。",
       "sources": [
-        {"url":"https://www.keiseirose.co.jp/garden/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
-        {"url":"https://www.keiseirose.co.jp/garden/access/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
-        {"url":"https://www.keiseirose.co.jp/garden/businessguide/","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"},
-        {"url":"https://maruchiba.jp/spot/detail_10078.html","checked_at":"2026-10-08T12:25:57Z","use_basis":"independently-verified-facts"}
+        {
+          "url": "https://www.keiseirose.co.jp/garden/",
+          "checked_at": "2026-10-08T12:25:57Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.keiseirose.co.jp/garden/access/",
+          "checked_at": "2026-10-08T12:25:57Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.keiseirose.co.jp/garden/businessguide/",
+          "checked_at": "2026-10-08T12:25:57Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_10078.html",
+          "checked_at": "2026-10-08T12:25:57Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "tsukuba-botanical-garden",
+      "name": "筑波実験植物園（つくば植物園）",
+      "categories": [
+        "botanical-garden"
+      ],
+      "prefecture": "茨城県",
+      "city": "つくば市",
+      "official_url": "https://tbg.kahaku.go.jp/riyou/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 1,
+      "summary": "温室と屋外の植栽をめぐり、植物の多様性を学べる研究植物園",
+      "features": [
+        "国立科学博物館の植物研究と保全を担う植物園。",
+        "屋外の植栽区画と温室があり、水生植物温室でも植物を観察できます。"
+      ],
+      "access_note": "茨城県つくば市天久保4-1-1。入園は有料。休園日・温室の公開状況は公式案内をご確認ください。",
+      "location": {
+        "lat": 36.1012717,
+        "lon": 140.1117278,
+        "source_url": "https://www.openstreetmap.org/way/235640732",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see",
+        "learn"
+      ],
+      "sources": [
+        {
+          "url": "https://tbg.kahaku.go.jp/riyou/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://tbg.kahaku.go.jp/riyou/nyuen.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://tbg.kahaku.go.jp/introduction/summary/imgs/tsukuba_leaflet_multi.pdf",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "rikugien",
+      "name": "六義園",
+      "categories": [
+        "garden"
+      ],
+      "prefecture": "東京都",
+      "city": "文京区",
+      "official_url": "https://www.tokyo-park.or.jp/park/rikugien/index.html",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 1,
+      "summary": "池のまわりを歩いて楽しむ日本庭園。春のしだれ桜と秋の紅葉も魅力",
+      "features": [
+        "池と築山を配した回遊式の日本庭園。",
+        "しだれ桜や紅葉など、季節の景観を楽しめます。"
+      ],
+      "access_note": "東京都文京区本駒込6-16-3。入園は有料。夜間開園などの特別催事は通常の入園条件と異なる場合があります。",
+      "location": {
+        "lat": 35.7333998,
+        "lon": 139.7463046,
+        "source_url": "https://www.openstreetmap.org/way/249498496",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see"
+      ],
+      "sources": [
+        {
+          "url": "https://www.tokyo-park.or.jp/park/rikugien/index.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "kamakura-hasedera",
+      "name": "鎌倉 長谷寺",
+      "categories": [
+        "cultural-garden"
+      ],
+      "prefecture": "神奈川県",
+      "city": "鎌倉市",
+      "official_url": "https://www.hasedera.jp/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "海を望む境内をめぐり、あじさいの散策路を楽しむ寺院",
+      "features": [
+        "斜面に沿うあじさいの散策路と、海を望む境内の景観が特徴。",
+        "あじさいは約40種類・約2,500株。開花時期の案内は公式発表で確認できます。"
+      ],
+      "access_note": "神奈川県鎌倉市長谷3-11-2。拝観は有料。あじさいの散策路は別途料金や入場方法が設定される場合があるため、訪問前に公式案内をご確認ください。",
+      "location": {
+        "lat": 35.3122687,
+        "lon": 139.5333092,
+        "source_url": "https://www.openstreetmap.org/way/695597656",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see"
+      ],
+      "sources": [
+        {
+          "url": "https://www.hasedera.jp/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.hasedera.jp/about/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "ginza-six-garden",
+      "name": "GINZA SIX ガーデン",
+      "categories": [
+        "urban"
+      ],
+      "prefecture": "東京都",
+      "city": "中央区",
+      "official_url": "https://ginza6.tokyo/facilities/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "銀座の屋上で緑にひと息。街歩きの途中に立ち寄れる庭園",
+      "features": [
+        "商業施設の屋上に整備された、約4,000平方メートルの庭園。",
+        "地域に開放された空間で、街なかの緑を楽しめます。"
+      ],
+      "access_note": "東京都中央区銀座6-10-1 GINZA SIX屋上。地図は建物代表点です。屋上の開放時間や休館・利用制限は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.6695326,
+        "lon": 139.764049,
+        "source_url": "https://www.openstreetmap.org/way/488225309",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see"
+      ],
+      "sources": [
+        {
+          "url": "https://ginza6.tokyo/facilities/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://ginza6.tokyo/news/detail/news/37241/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "katsushika-hachimangu-ginkgo",
+      "name": "葛飾八幡宮（千本公孫樹）",
+      "categories": [
+        "heritage-tree"
+      ],
+      "prefecture": "千葉県",
+      "city": "市川市",
+      "official_url": "https://www.katsushikahachimangu.com/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "境内に立つ国の天然記念物、千本公孫樹に出会える神社",
+      "features": [
+        "境内の大きなイチョウ「千本公孫樹」は国の天然記念物。",
+        "参拝とあわせて古木の姿を観察できます。"
+      ],
+      "access_note": "千葉県市川市八幡4-2-1。地図は神社敷地の代表点で、木そのものの位置ではありません。境内の参拝・観覧ルールをお守りください。",
+      "location": {
+        "lat": 35.724177,
+        "lon": 139.931109,
+        "source_url": "https://maruchiba.jp/spot/detail_10062.html",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see"
+      ],
+      "sources": [
+        {
+          "url": "https://www.katsushikahachimangu.com/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_10062.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "ozaki-flower-park",
+      "name": "オザキフラワーパーク",
+      "categories": [
+        "garden-center"
+      ],
+      "prefecture": "東京都",
+      "city": "練馬区",
+      "official_url": "https://ozaki-flowerpark.co.jp/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "草花から観葉植物まで、育てたい植物と園芸用品を探せる大型店",
+      "features": [
+        "草花・庭木・観葉植物など、幅広い植物を扱うガーデンセンター。",
+        "園芸用品もあわせて探せます。品ぞろえと在庫は来店時の公式案内でご確認ください。"
+      ],
+      "access_note": "東京都練馬区石神井台4-6-32。売場ごとの取扱商品・営業時間は公式サイトをご確認ください。",
+      "location": {
+        "lat": 35.7325316,
+        "lon": 139.5827173,
+        "source_url": "https://www.openstreetmap.org/way/1047427897",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://ozaki-flowerpark.co.jp/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "solso-farm",
+      "name": "SOLSO FARM",
+      "categories": [
+        "specialist-houseplants"
+      ],
+      "prefecture": "神奈川県",
+      "city": "川崎市宮前区",
+      "official_url": "https://solsofarm.com/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "観葉植物や多肉植物に出会う週末の植物ショップ。土日祝に営業",
+      "features": [
+        "観葉植物・多肉植物・屋外向けの植物と、植物にまつわる雑貨を扱います。",
+        "一般向けの営業は土曜・日曜・祝日です。"
+      ],
+      "access_note": "神奈川県川崎市宮前区西野川2-6。土日祝のみ一般営業。臨時休業・営業時間は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.5716347,
+        "lon": 139.6058276,
+        "source_url": "https://www.openstreetmap.org/node/10308986380",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://solsofarm.com/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "seikouen-main",
+      "name": "盆栽 清香園 本店",
+      "categories": [
+        "specialist-bonsai"
+      ],
+      "prefecture": "埼玉県",
+      "city": "さいたま市北区",
+      "official_url": "https://seikouen.cc/company.html",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "大宮盆栽村の盆栽園。盆栽を眺め、育てる一鉢を探せる場所",
+      "features": [
+        "盆栽の販売と管理を行う盆栽園。",
+        "彩花盆栽の教室も展開しています。受講条件は公式案内をご確認ください。"
+      ],
+      "access_note": "埼玉県さいたま市北区盆栽町268。営業時間・入園締切・定休日は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.9266408,
+        "lon": 139.6336243,
+        "source_url": "https://www.openstreetmap.org/node/3656249928",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see",
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://seikouen.cc/company.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.seikouen.cc/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "kobayashi-seed-store",
+      "name": "小林種苗本店",
+      "categories": [
+        "nursery"
+      ],
+      "prefecture": "千葉県",
+      "city": "市川市",
+      "official_url": "https://www.kobatane.com/about",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "家庭菜園の種や季節の苗を探せる、市川の種苗店",
+      "features": [
+        "野菜・花の種や、季節の野菜苗を扱います。",
+        "家庭菜園向けの小袋種子や、肥料などの資材も扱います。"
+      ],
+      "access_note": "千葉県市川市八幡1-10-5。日曜・祝日を基本に休業し、季節の苗販売期は例外があります。営業日と苗の販売時間は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.7204421,
+        "lon": 139.9342451,
+        "source_url": "https://www.openstreetmap.org/node/13875821428",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://www.kobatane.com/about",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.kobatane.com/blank",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "aoyama-flower-market-azabu",
+      "name": "青山フラワーマーケット 麻布十番店",
+      "categories": [
+        "florist"
+      ],
+      "prefecture": "東京都",
+      "city": "港区",
+      "official_url": "https://www.aoyamaflowermarket.com/category/SHOP183/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "季節の切り花や花束を、麻布十番の街歩きと一緒に選べる花屋",
+      "features": [
+        "旬の切り花や花束を扱うフラワーショップ。",
+        "麻布十番駅4番出口から徒歩約1分。"
+      ],
+      "access_note": "東京都港区麻布十番2-1-2。営業時間・当日の品ぞろえは店舗の公式案内をご確認ください。",
+      "location": {
+        "lat": 35.6555359,
+        "lon": 139.7361463,
+        "source_url": "https://www.openstreetmap.org/node/13786121100",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://www.aoyamaflowermarket.com/category/SHOP183/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "protoleaf-futakotamagawa",
+      "name": "プロトリーフ 二子玉川本店",
+      "categories": [
+        "garden-supplies"
+      ],
+      "prefecture": "東京都",
+      "city": "世田谷区",
+      "official_url": "https://www.protoleaf.com/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "鉢や土、道具から植物まで。二子玉川の屋上で園芸の準備を整える店",
+      "features": [
+        "植木鉢・用土・肥料・園芸道具を扱います。",
+        "草花・観葉植物・アガベなど、植物の売場もあります。"
+      ],
+      "access_note": "東京都世田谷区玉川3-17-1 玉川髙島屋S・C本館屋上7F。地図は商業施設の代表点です。2024年移転後の店舗で、旧ガーデンアイランドの所在地とは異なります。",
+      "location": {
+        "lat": 35.6141427,
+        "lon": 139.6267355,
+        "source_url": "https://www.openstreetmap.org/relation/15045086",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://www.protoleaf.com/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.protoleaf.com/?page_id=21925",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "minorinosato-togane",
+      "name": "道の駅 みのりの郷東金",
+      "categories": [
+        "farm-market"
+      ],
+      "prefecture": "千葉県",
+      "city": "東金市",
+      "official_url": "https://minorinosato-togane.com/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "植木や鉢花を探せる緑花木市場と、農産物の直売所がある道の駅",
+      "features": [
+        "緑花木市場では植木・盆栽・鉢花を扱います。",
+        "農産物直売所と飲食施設も併設しています。"
+      ],
+      "access_note": "千葉県東金市田間1300-3。市場・直売所ごとの営業時間と入荷状況は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.577405,
+        "lon": 140.383011,
+        "source_url": "https://maruchiba.jp/spot/detail_10257.html",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://minorinosato-togane.com/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_10257.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "aquaforest-solamachi",
+      "name": "アクアフォレスト ソラマチ店",
+      "categories": [
+        "aquatic-plants"
+      ],
+      "prefecture": "東京都",
+      "city": "墨田区",
+      "official_url": "https://www.aquaforest.shop/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "水草の水景やテラリウムを楽しみ、育てる素材を探せる専門店",
+      "features": [
+        "水草水槽やテラリウムの植物・用品を扱います。",
+        "東京ソラマチの商店街にあるアクアリウム専門店です。"
+      ],
+      "access_note": "東京都墨田区押上1-1-2 東京ソラマチ1階 イーストヤード11番地。取扱商品・営業日は店舗の公式案内をご確認ください。",
+      "location": {
+        "lat": 35.7101092,
+        "lon": 139.812997,
+        "source_url": "https://www.openstreetmap.org/node/9081441283",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://www.aquaforest.shop/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.aquaforest.shop/店舗情報",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://pro.tokyo-solamachi.jp/shop/469/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "omiya-bonsai-art-museum",
+      "name": "さいたま市大宮盆栽美術館",
+      "categories": [
+        "learning"
+      ],
+      "prefecture": "埼玉県",
+      "city": "さいたま市北区",
+      "official_url": "https://www.bonsai-art-museum.jp/ja/access-2/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "展示室と盆栽庭園で、盆栽の見方や文化を学べる美術館",
+      "features": [
+        "展示室では盆栽の鑑賞や飾り方を紹介しています。",
+        "屋外の盆栽庭園でも作品を観賞できます。"
+      ],
+      "access_note": "埼玉県さいたま市北区土呂町2-24-3。入館は有料。木曜などの休館日、季節ごとの開館時間は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.9285484,
+        "lon": 139.6335415,
+        "source_url": "https://www.openstreetmap.org/way/195072874",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see",
+        "learn"
+      ],
+      "sources": [
+        {
+          "url": "https://www.bonsai-art-museum.jp/ja/access-2/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://www.bonsai-art-museum.jp/ja/facilities/service-3/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "seikouen-nihombashi-workshop",
+      "name": "清香園 日本橋三越本店（盆栽体験）",
+      "categories": [
+        "workshop"
+      ],
+      "prefecture": "東京都",
+      "city": "中央区",
+      "official_url": "https://www.mistore.jp/store/nihombashi/shops/experience/bonsai/shopnews_list/shopnews04.html",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "苗と鉢を選んで盆栽づくりを学ぶ、予約制の体験教室",
+      "features": [
+        "盆栽体験や個別の盆栽レッスンを案内しています。",
+        "予約後に開催日程を調整する方式です。受講料金と空き状況は公式案内をご確認ください。"
+      ],
+      "access_note": "東京都中央区日本橋室町1-4-1 日本橋三越本店本館屋上。体験は予約制。地図は百貨店の代表点です。",
+      "location": {
+        "lat": 35.6856339,
+        "lon": 139.7734359,
+        "source_url": "https://www.openstreetmap.org/relation/7872611",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "learn",
+        "experience"
+      ],
+      "sources": [
+        {
+          "url": "https://www.mistore.jp/store/nihombashi/shops/experience/bonsai/shopnews_list/shopnews04.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://seikouen.cc/company.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "isoyama-strawberry-farm",
+      "name": "磯山観光いちご園",
+      "categories": [
+        "picking-farm"
+      ],
+      "prefecture": "千葉県",
+      "city": "香取郡東庄町",
+      "official_url": "https://isoyama1583.com/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "冬から春のいちご狩りを楽しめる農園。6〜11月はシーズン休園",
+      "features": [
+        "温室でいちご狩りを楽しめる季節営業の観光農園。",
+        "6月から11月はシーズンオフで閉園します。"
+      ],
+      "access_note": "千葉県香取郡東庄町笹川い4539。6〜11月は休園中です。いちご狩りの実施期間・予約条件・料金は次シーズンの公式案内をご確認ください。",
+      "location": {
+        "lat": 35.8351483,
+        "lon": 140.6701567,
+        "source_url": "https://maruchiba.jp/spot/detail_10516.html",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "experience",
+        "harvest"
+      ],
+      "sources": [
+        {
+          "url": "https://isoyama1583.com/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_10516.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "sharebatake-yukigayaotsuka",
+      "name": "シェア畑 雪が谷大塚駅前",
+      "categories": [
+        "allotment"
+      ],
+      "prefecture": "東京都",
+      "city": "大田区",
+      "official_url": "https://www.sharebatake.com/farms/tokyo/oota/yukigayaotsuka",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "アドバイザーの支援で野菜づくりを体験できる、契約制の貸農園",
+      "features": [
+        "区画を借りて野菜づくりと収穫を楽しめる農園。",
+        "栽培の支援や講習を受けられます。"
+      ],
+      "access_note": "東京都大田区南雪谷2-2-4 シーアイマンション雪が谷南側の畑。利用は契約制。見学は公式サイトから申し込み、空き区画と利用料金をご確認ください。",
+      "location": {
+        "lat": 35.5922786,
+        "lon": 139.6816563,
+        "source_url": "https://www.openstreetmap.org/way/1424287428",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "learn",
+        "experience",
+        "harvest"
+      ],
+      "sources": [
+        {
+          "url": "https://www.sharebatake.com/farms/tokyo/oota/yukigayaotsuka",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "kujukuri-herb-garden",
+      "name": "九十九里ハーブガーデン",
+      "categories": [
+        "garden-cafe"
+      ],
+      "prefecture": "千葉県",
+      "city": "山武郡九十九里町",
+      "official_url": "https://www.herb-cool.com/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "ハーブの庭を散策し、カフェやレストランでひと休みできる場所",
+      "features": [
+        "さまざまなハーブを植えた庭園に、レストランとケーキの販売を併設。",
+        "ハーブ苗などを扱うショップもあります。"
+      ],
+      "access_note": "千葉県山武郡九十九里町片貝4477。庭園は入場無料。レストラン・ショップの営業日と営業時間は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.546068,
+        "lon": 140.442998,
+        "source_url": "https://maruchiba.jp/spot/detail_10268.html",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see",
+        "buy"
+      ],
+      "sources": [
+        {
+          "url": "https://www.herb-cool.com/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_10268.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "izumi-nature-park",
+      "name": "泉自然公園",
+      "categories": [
+        "nature-trail"
+      ],
+      "prefecture": "千葉県",
+      "city": "千葉市若葉区",
+      "official_url": "https://izumi-park.city.chiba.jp/",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 2,
+      "summary": "林や池をめぐり、桜や紅葉など季節の植物を観察できる公園",
+      "features": [
+        "樹林や池を生かした自然の中を散策できます。",
+        "春の桜や秋の紅葉など、季節による景色の変化が楽しめます。"
+      ],
+      "access_note": "千葉県千葉市若葉区野呂町108。入園無料、駐車場は有料。園内の通行案内と開園時間は公式サイトをご確認ください。",
+      "location": {
+        "lat": 35.57784,
+        "lon": 140.22732,
+        "source_url": "https://maruchiba.jp/spot/detail_10573.html",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see"
+      ],
+      "sources": [
+        {
+          "url": "https://izumi-park.city.chiba.jp/",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_10573.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
+      ]
+    },
+    {
+      "id": "chiba-urban-greening-garden",
+      "name": "千葉市都市緑化植物園（イベント会場）",
+      "categories": [
+        "plant-event"
+      ],
+      "prefecture": "千葉県",
+      "city": "千葉市中央区",
+      "official_url": "https://toshiryokka.jp/news",
+      "public_access": true,
+      "verified_at": "2026-10-08T13:19:06Z",
+      "label_priority": 3,
+      "summary": "季節の植物展示や催しに出会える、千葉市の都市緑化植物園",
+      "features": [
+        "みどりの相談所では、植物にまつわる展示や催しを案内しています。",
+        "イベントとは別に、屋外の植栽を散策できる植物園です。"
+      ],
+      "access_note": "千葉県千葉市中央区星久喜町278。盆栽展は2026年10月16〜18日、各日10〜16時、みどりの相談所講習室。参加無料。開催変更や園の休園日は公式案内をご確認ください。",
+      "location": {
+        "lat": 35.6014685,
+        "lon": 140.1525646,
+        "source_url": "https://maruchiba.jp/spot/detail_13745.html",
+        "verified_at": "2026-10-08T13:19:06Z",
+        "precision": "site-reference"
+      },
+      "purposes": [
+        "see"
+      ],
+      "sources": [
+        {
+          "url": "https://toshiryokka.jp/news",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/spot/detail_13745.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        },
+        {
+          "url": "https://maruchiba.jp/event/detail_14051.html",
+          "checked_at": "2026-10-08T13:19:06Z",
+          "use_basis": "independently-verified-facts"
+        }
       ]
     }
   ],
   "targets": [
-    {"id":"keisei-rose-garden-roses","facility_id":"keisei-rose-garden","plant_id":"rose","area":"ローズガーデン","environment":"outdoor","purposes":["see"]}
+    {
+      "id": "keisei-rose-garden-roses",
+      "facility_id": "keisei-rose-garden",
+      "plant_id": "rose",
+      "area": "ローズガーデン",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "tsukuba-botanical-garden-aquatic-1",
+      "facility_id": "tsukuba-botanical-garden",
+      "plant_id": "aquatic",
+      "area": "水生植物温室",
+      "environment": "greenhouse",
+      "purposes": [
+        "see",
+        "learn"
+      ]
+    },
+    {
+      "id": "tsukuba-botanical-garden-trees-2",
+      "facility_id": "tsukuba-botanical-garden",
+      "plant_id": "trees",
+      "area": "屋外の植栽区画",
+      "environment": "outdoor",
+      "purposes": [
+        "see",
+        "learn"
+      ]
+    },
+    {
+      "id": "rikugien-cherry-1",
+      "facility_id": "rikugien",
+      "plant_id": "cherry",
+      "area": "庭園",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "rikugien-maple-2",
+      "facility_id": "rikugien",
+      "plant_id": "maple",
+      "area": "庭園",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "kamakura-hasedera-hydrangea-1",
+      "facility_id": "kamakura-hasedera",
+      "plant_id": "hydrangea",
+      "area": "あじさいの散策路",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "ginza-six-garden-trees-1",
+      "facility_id": "ginza-six-garden",
+      "plant_id": "trees",
+      "area": "屋上庭園",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "katsushika-hachimangu-ginkgo-ginkgo-1",
+      "facility_id": "katsushika-hachimangu-ginkgo",
+      "plant_id": "ginkgo",
+      "area": "境内の千本公孫樹",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "ozaki-flower-park-seasonal-flowers-1",
+      "facility_id": "ozaki-flower-park",
+      "plant_id": "seasonal-flowers",
+      "area": "植物販売の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "ozaki-flower-park-houseplants-2",
+      "facility_id": "ozaki-flower-park",
+      "plant_id": "houseplants",
+      "area": "観葉植物の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "ozaki-flower-park-succulents-3",
+      "facility_id": "ozaki-flower-park",
+      "plant_id": "succulents",
+      "area": "多肉植物の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "solso-farm-houseplants-1",
+      "facility_id": "solso-farm",
+      "plant_id": "houseplants",
+      "area": "INDOOR PLANTSの売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "solso-farm-succulents-2",
+      "facility_id": "solso-farm",
+      "plant_id": "succulents",
+      "area": "CACTUS & SUCCULENT HOUSE",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "solso-farm-herbs-3",
+      "facility_id": "solso-farm",
+      "plant_id": "herbs",
+      "area": "屋外向け植物の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "seikouen-main-bonsai-1",
+      "facility_id": "seikouen-main",
+      "plant_id": "bonsai",
+      "area": "本店の盆栽園・売場",
+      "environment": "unknown",
+      "purposes": [
+        "see",
+        "buy"
+      ]
+    },
+    {
+      "id": "kobayashi-seed-store-vegetables-1",
+      "facility_id": "kobayashi-seed-store",
+      "plant_id": "vegetables",
+      "area": "種・苗の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "kobayashi-seed-store-seasonal-flowers-2",
+      "facility_id": "kobayashi-seed-store",
+      "plant_id": "seasonal-flowers",
+      "area": "花の種の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "aoyama-flower-market-azabu-cut-flowers-1",
+      "facility_id": "aoyama-flower-market-azabu",
+      "plant_id": "cut-flowers",
+      "area": "切り花の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "protoleaf-futakotamagawa-houseplants-1",
+      "facility_id": "protoleaf-futakotamagawa",
+      "plant_id": "houseplants",
+      "area": "植物の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "protoleaf-futakotamagawa-agave-2",
+      "facility_id": "protoleaf-futakotamagawa",
+      "plant_id": "agave",
+      "area": "植物の売場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "minorinosato-togane-bonsai-1",
+      "facility_id": "minorinosato-togane",
+      "plant_id": "bonsai",
+      "area": "緑花木市場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "minorinosato-togane-seasonal-flowers-2",
+      "facility_id": "minorinosato-togane",
+      "plant_id": "seasonal-flowers",
+      "area": "緑花木市場",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "aquaforest-solamachi-aquatic-1",
+      "facility_id": "aquaforest-solamachi",
+      "plant_id": "aquatic",
+      "area": "水草の売場",
+      "environment": "indoor",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "aquaforest-solamachi-moss-2",
+      "facility_id": "aquaforest-solamachi",
+      "plant_id": "moss",
+      "area": "テラリウム植物の売場",
+      "environment": "indoor",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "omiya-bonsai-art-museum-bonsai-1",
+      "facility_id": "omiya-bonsai-art-museum",
+      "plant_id": "bonsai",
+      "area": "展示室",
+      "environment": "indoor",
+      "purposes": [
+        "see",
+        "learn"
+      ]
+    },
+    {
+      "id": "omiya-bonsai-art-museum-bonsai-2",
+      "facility_id": "omiya-bonsai-art-museum",
+      "plant_id": "bonsai",
+      "area": "盆栽庭園",
+      "environment": "outdoor",
+      "purposes": [
+        "see",
+        "learn"
+      ]
+    },
+    {
+      "id": "seikouen-nihombashi-workshop-bonsai-1",
+      "facility_id": "seikouen-nihombashi-workshop",
+      "plant_id": "bonsai",
+      "area": "盆栽体験・レッスン",
+      "environment": "unknown",
+      "purposes": [
+        "learn",
+        "experience"
+      ]
+    },
+    {
+      "id": "isoyama-strawberry-farm-strawberry-1",
+      "facility_id": "isoyama-strawberry-farm",
+      "plant_id": "strawberry",
+      "area": "いちご狩りの温室",
+      "environment": "greenhouse",
+      "purposes": [
+        "experience",
+        "harvest"
+      ]
+    },
+    {
+      "id": "sharebatake-yukigayaotsuka-vegetables-1",
+      "facility_id": "sharebatake-yukigayaotsuka",
+      "plant_id": "vegetables",
+      "area": "契約区画の畑",
+      "environment": "outdoor",
+      "purposes": [
+        "learn",
+        "experience",
+        "harvest"
+      ]
+    },
+    {
+      "id": "kujukuri-herb-garden-herbs-1",
+      "facility_id": "kujukuri-herb-garden",
+      "plant_id": "herbs",
+      "area": "ハーブの庭",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "kujukuri-herb-garden-herbs-2",
+      "facility_id": "kujukuri-herb-garden",
+      "plant_id": "herbs",
+      "area": "ショップのハーブ苗",
+      "environment": "unknown",
+      "purposes": [
+        "buy"
+      ]
+    },
+    {
+      "id": "izumi-nature-park-cherry-1",
+      "facility_id": "izumi-nature-park",
+      "plant_id": "cherry",
+      "area": "園内の散策路",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "izumi-nature-park-maple-2",
+      "facility_id": "izumi-nature-park",
+      "plant_id": "maple",
+      "area": "園内の散策路",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "izumi-nature-park-trees-3",
+      "facility_id": "izumi-nature-park",
+      "plant_id": "trees",
+      "area": "園内の樹林",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "chiba-urban-greening-garden-rose-1",
+      "facility_id": "chiba-urban-greening-garden",
+      "plant_id": "rose",
+      "area": "園内のバラ",
+      "environment": "outdoor",
+      "purposes": [
+        "see"
+      ]
+    },
+    {
+      "id": "chiba-urban-greening-garden-bonsai-2",
+      "facility_id": "chiba-urban-greening-garden",
+      "plant_id": "bonsai",
+      "area": "秋の盆栽作風展・講習室",
+      "environment": "indoor",
+      "purposes": [
+        "see"
+      ],
+      "event_id": "chiba-autumn-bonsai-2026"
+    }
   ],
   "observations": [],
   "forecasts": [],
@@ -80,12 +1427,77 @@
       "target_id": "keisei-rose-garden-roses",
       "basis": "typical-season",
       "periods": [
-        {"label":"春","description":"5月上〜中旬から6月中旬ごろ"},
-        {"label":"秋","description":"10月中旬から11月下旬ごろ"}
+        {
+          "label": "春",
+          "description": "5月上〜中旬から6月中旬ごろ"
+        },
+        {
+          "label": "秋",
+          "description": "10月中旬から11月下旬ごろ"
+        }
       ],
       "source_url": "https://maruchiba.jp/spot/detail_10078.html",
       "checked_at": "2026-10-08T12:33:29Z"
+    },
+    {
+      "id": "rikugien-cherry-typical-season",
+      "target_id": "rikugien-cherry-1",
+      "basis": "typical-season",
+      "periods": [
+        {
+          "label": "春",
+          "description": "しだれ桜は3月末ごろ"
+        }
+      ],
+      "source_url": "https://www.tokyo-park.or.jp/park/rikugien/index.html",
+      "checked_at": "2026-10-08T13:19:06Z"
+    },
+    {
+      "id": "rikugien-maple-typical-season",
+      "target_id": "rikugien-maple-2",
+      "basis": "typical-season",
+      "periods": [
+        {
+          "label": "秋",
+          "description": "紅葉は11月下旬ごろ"
+        }
+      ],
+      "source_url": "https://www.tokyo-park.or.jp/park/rikugien/index.html",
+      "checked_at": "2026-10-08T13:19:06Z"
+    },
+    {
+      "id": "kujukuri-herb-garden-herbs-typical-season",
+      "target_id": "kujukuri-herb-garden-herbs-1",
+      "basis": "typical-season",
+      "periods": [
+        {
+          "label": "春〜夏",
+          "description": "3月末から7月中旬ごろ"
+        }
+      ],
+      "source_url": "https://www.herb-cool.com/",
+      "checked_at": "2026-10-08T13:19:06Z"
     }
   ],
-  "events": []
+  "events": [
+    {
+      "id": "chiba-autumn-bonsai-2026",
+      "facility_id": "chiba-urban-greening-garden",
+      "name": "秋の盆栽作風展",
+      "starts_at": "2026-10-16T10:00:00+09:00",
+      "ends_at": "2026-10-18T16:00:00+09:00",
+      "schedule_note": "2026年10月16〜18日、各日10〜16時",
+      "venue": "みどりの相談所 講習室",
+      "admission_note": "参加無料",
+      "source_url": "https://toshiryokka.jp/news",
+      "checked_at": "2026-10-08T13:19:06Z",
+      "reviewed": true,
+      "cancelled": false
+    }
+  ],
+  "data_license": {
+    "name": "Open Database License 1.0",
+    "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "attribution": "施設位置の一部は © OpenStreetMap contributors。施設情報は公式発表の事実を独自に整理。"
+  }
 }
