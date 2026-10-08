@@ -1,0 +1,47 @@
+植物めぐりMAP — 全国収録データの出典と利用条件
+
+対象: nationwide.json
+場所データ: Overture Maps Places, release 2026-09-23.1
+https://docs.overturemaps.org/guides/places/
+https://docs.overturemaps.org/attribution/
+
+Data from Meta, Microsoft and Overture: CDLA-Permissive-2.0.
+A copy is provided in CDLA-Permissive-2.0.txt.
+Data from Foursquare: Copyright 2024 Foursquare Labs, Inc. All rights reserved.
+Foursquare data was transformed to the Overture schema. Changed: 2026-03-18.
+Apache License 2.0 and the current Foursquare notice are supplied in
+Apache-2.0.txt and Foursquare-NOTICE.txt. Source notices are retained separately.
+The providers array in nationwide.json identifies each record's source licenses.
+
+都道府県の照合: geoBoundaries gbOpen JPN ADM1, JPN-ADM1-47310658.
+Boundary sources: OpenStreetMap, Wambacher (2017 boundaries, 2023 build).
+© OpenStreetMap contributors. Open Database License 1.0 (ODbL).
+https://www.geoboundaries.org/api/current/gbOpen/JPN/ADM1/
+https://www.openstreetmap.org/copyright
+https://opendatacommons.org/licenses/odbl/1-0/
+Administrative polygons are used only to assign/check prefectures; they are
+not displayed or included here. The resulting geographic assignments and
+combined derived database are provided under ODbL 1.0, with the underlying
+Places license texts and attribution retained. Source Places records and IDs
+remain identifiable separately from the added prefecture assignment.
+
+Changes by NatureWxLab, October 2026:
+日本国内の植物関連分類・名称を選別し、公開向けの必要項目に限定。
+元データの名称は整形以外に創作せず、GERS IDを保持。
+屋外スポットの近接した別言語レコードは、日本語を含む名称を優先。
+ジャンル・目的は元の分類と名称による目安。体験・収穫の実施日は未確認。
+花・ギフト分類は植物関連の名称も照合し、一般ギフト店・コンビニ等を除外。
+自然観察向けの公園・遊歩道などを収録。施設内のトイレや駐車場を除外。
+元データの存在信頼度0.7以上、都道府県と位置の照合、名称と近接位置の
+重複除去を適用。存在信頼度は営業中・来訪可能・分類正解の保証ではない。
+電話・メール・SNS・個人連絡先・住所番地は掲載しない。
+掲載URLのクエリとフラグメントを除去。HTTPだけのURLは掲載しない。
+市区町村名は原データ。座標は小数点6桁に丸め、入口を保証しない。
+名称・分類・位置・閉店などの誤りが残る場合がある。
+植物の種類・在庫・見頃・営業状況・来訪可否は個別未確認。
+
+個別に公式情報を確認した施設は catalog.json に別管理し、全国収録分に
+個別確認日や公式サイトという表示を付けない。花店などの収録が多く、
+地域・ジャンルの完全な網羅やおすすめ順位を意味しない。
+収録日時・候補数・選別数は nationwide.json のメタデータを参照。
+定期的な自動更新は行っていない。

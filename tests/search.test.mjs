@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validateCatalog, searchCatalog, safeUrl, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan, eventStatus } from '../site/engine.mjs';
+import { validateCatalog, mergeCatalog, searchCatalog, safeUrl, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan, mapClusterPlan, eventStatus, PREFECTURES } from '../site/engine.mjs';
 const now = Date.parse('2026-10-08T12:00:00+09:00');
 function fixture() {
   const data = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
@@ -59,7 +59,7 @@ test('不正座標・参照・日付・URL・未対応予想で公開を止め�
   }
 });
 test('リンク先にスクリプト・認証情報・ローカル・HTTPを許可しない', () => {
-  for (const url of ['javascript:alert(1)', 'data:text/html,test', 'http://example.org/', 'https://' + 'a:b@' + 'example.org/', 'https://localhost/', 'https://127.0.0.1/']) assert.equal(safeUrl(url), null);
+  for (const url of ['javascript:alert(1)', 'data:text/html,test', 'http://example.org/', 'https://' + 'a:b@' + 'example.org/', 'https://localhost/', 'https://127.0.0.1/', 'https://10.0.0.1/', 'https://192.168.1.1/', 'https://host.local/']) assert.equal(safeUrl(url), null);
   assert.equal(safeUrl('https://example.org/'), 'https://example.org/');
 });
 function filterFixture() {
@@ -157,5 +157,40 @@ test('イベントの未確認・不正日時・別施設参照と位置のラ�
   const published = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
   for (const change of [d => d.events[0].reviewed = false, d => d.events[0].ends_at = d.events[0].starts_at, d => d.events[0].source_url = 'javascript:alert(1)', d => d.events[0].facility_id = 'missing', d => d.targets.at(-1).event_id = 'missing', d => d.events[0].facility_id = 'rikugien', d => delete d.data_license]) {
     const data = structuredClone(published); change(data); assert.throws(() => validateCatalog(data));
+  }
+});
+test('空白区切りのAND検索とひらがな・カタカナの表記ゆれ', () => {
+  const data = fixture(); data.facilities[0].name = 'バラ園';
+  assert.equal(searchCatalog(data, { query: '東京　ばら' }).length, 1);
+  assert.equal(searchCatalog(data, { query: '神奈川 バラ' }).length, 0);
+});
+test('密集する1万施設を件数を失わず集約し、選択施設は単独で残す', () => {
+  const points = Array.from({ length: 10000 }, (_, i) => ({ x: 5 + i % 990, y: 5 + Math.floor(i / 990) * 10, facility: { id: `f-${i}` } }));
+  const plan = mapClusterPlan(points, 6, { x: 1000, y: 600 }, 'f-50');
+  assert.ok(plan.length < 240);
+  assert.equal(plan.reduce((n, g) => n + g.points.length, 0), 10000);
+  assert.ok(plan.some(g => g.points.length === 1 && g.points[0].facility.id === 'f-50'));
+  assert.equal(mapClusterPlan([{ ...points[0], x: -5 }], 10, { x: 1000, y: 600 }).length, 0);
+});
+test('全国データは個別確認と区別し、47都道府県・1万件の検索を検証する', () => {
+  const manual = JSON.parse(readFileSync(new URL('../site/data/catalog.json', import.meta.url)));
+  const bulk = JSON.parse(readFileSync(new URL('../site/data/nationwide.json', import.meta.url)));
+  const data = mergeCatalog(manual, bulk);
+  assert.equal(data.facilities.length, 10000);
+  assert.equal(new Set(data.facilities.map(f => f.prefecture)).size, 47);
+  assert.equal(new Set(data.facilities.map(f => f.id)).size, 10000);
+  assert.equal(searchCatalog(data, { verified: true }).length, manual.facilities.length);
+  const start = performance.now();
+  for (const prefecture of PREFECTURES) assert.ok(searchCatalog(data, { prefecture }).length > 0);
+  const facets = facetCounts(data, {});
+  assert.equal(Object.values(facets.prefecture).reduce((a, b) => a + b), 10000);
+  assert.ok(performance.now() - start < 3000, '検索・件数集計の性能が低下');
+  assert.equal(searchCatalog(data, { peak: true }).length, 0);
+  const first = data.facilities.find(f => f.data_tier === 'open-data');
+  assert.equal(first.official_url, undefined);
+  assert.equal(first.verified_at, undefined);
+  assert.equal(searchCatalog(data, { query: first.name, prefecture: first.prefecture }).some(r => r.facility.id === first.id), true);
+  for (const change of [d => d.records[0].lat = 0, d => d.records[0].url = 'javascript:alert(1)', d => d.records[0].confidence = .1, d => d.records.push(d.records[0]), d => d.records[0].category = 'beer_garden', d => d.providers[0][0].license = 'unknown']) {
+    const broken = structuredClone(bulk); change(broken); assert.throws(() => mergeCatalog(manual, broken));
   }
 });

@@ -16,10 +16,12 @@ SITE_FILES = {
     'vendor/images/layers.png', 'vendor/images/layers-2x.png',
     'vendor/images/marker-icon.png', 'vendor/images/marker-icon-2x.png',
     'vendor/images/marker-shadow.png',
+    'data/nationwide.json', 'data/NOTICE.txt', 'data/CDLA-Permissive-2.0.txt',
+    'data/Apache-2.0.txt', 'data/Foursquare-NOTICE.txt',
 }
 REPO_FILES = {'README.md', '.gitignore', '.github/workflows/pages.yml',
               'scripts/check_release.py', 'scripts/vendor_hashes.json',
-              'tests/search.test.mjs'} | {'site/' + p for p in SITE_FILES}
+              'tests/search.test.mjs', 'scripts/import_places.py'} | {'site/' + p for p in SITE_FILES}
 IDENTITIES = {
     ('nature-wx-lab', '289840956+nature-wx-lab@users.noreply.github.com'),
     ('github-actions[bot]', '41898282+github-actions[bot]@users.noreply.github.com'),
@@ -66,7 +68,8 @@ def main():
         fail('vendor allowlist mismatch')
     for path in sorted(REPO_FILES):
         p = ROOT / path
-        if not p.is_file() or p.is_symlink() or p.stat().st_size > 600000:
+        limit = 6000000 if path == 'site/data/nationwide.json' else 600000
+        if not p.is_file() or p.is_symlink() or p.stat().st_size > limit:
             fail('missing, symbolic or oversized file: ' + path)
         scan(path.encode(), 'filename')
         raw = p.read_bytes()
@@ -76,7 +79,13 @@ def main():
         if hashlib.sha256((ROOT / 'site' / path).read_bytes()).hexdigest() != expected:
             fail('vendor bytes mismatch: ' + path)
     subprocess.run(['node', '--input-type=module', '-e',
-        "import {readFileSync} from 'node:fs'; import {validateCatalog} from './site/engine.mjs'; validateCatalog(JSON.parse(readFileSync('site/data/catalog.json')));"], cwd=ROOT, check=True)
+        "import {readFileSync} from 'node:fs'; import {mergeCatalog} from './site/engine.mjs'; const data = mergeCatalog(JSON.parse(readFileSync('site/data/catalog.json')), JSON.parse(readFileSync('site/data/nationwide.json'))); if (data.facilities.length !== 10000 || new Set(data.facilities.map(f=>f.prefecture)).size !== 47) throw Error('National coverage mismatch');"], cwd=ROOT, check=True)
+    bulk = json.loads((ROOT / 'site/data/nationwide.json').read_text())
+    fields = {'id', 'name', 'prefecture', 'city', 'category', 'lat', 'lon', 'url', 'confidence', 'source'}
+    if any(set(record) != fields for record in bulk['records']):
+        fail('nationwide record field allowlist mismatch')
+    if set(bulk) != {'schema_version', 'release', 'retrieved_at', 'count', 'minimum_confidence', 'geography_source', 'providers', 'records', 'selection'}:
+        fail('nationwide metadata field allowlist mismatch')
     # A clean new repository means this bounded history check starts with one commit.
     commits = git('rev-list', '--all').decode().splitlines()
     tracked = set(git('ls-files', '-z').decode().split('\0')) - {''}

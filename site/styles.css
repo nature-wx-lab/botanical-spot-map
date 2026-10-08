@@ -204,3 +204,21 @@ dialog{background:#fffef8;border-color:#b9cbac;box-shadow:0 12px 48px #15342633}
 .genre-key .genre-icon{width:30px;height:30px;box-shadow:none;border-width:1.5px}
 .genre-key .genre-icon svg{width:21px;height:21px}
 @media(max-width:450px){.genre-key{grid-template-columns:1fr}.leaflet-control-attribution{max-width:100%;font-size:9px!important}.map-message{max-width:calc(100% - 90px)}}
+.plant-cluster{border:0;background:transparent}
+.cluster-count{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#edf4dff5;border:3px solid #73995e;color:#244f32;box-shadow:0 2px 7px #234b3233;font-size:13px;font-weight:750;font-variant-numeric:tabular-nums}
+.plant-cluster:hover .cluster-count{background:#d5e5bf;border-color:#396c44}
+.plant-cluster:focus-visible .cluster-count{outline:3px solid #c68b3c;outline-offset:3px}
+.cluster-list{display:flex;flex-direction:column;gap:7px}
+.cluster-list button{border:1px solid var(--line);border-radius:5px;background:#f6f8ed;padding:8px;text-align:left;color:var(--green)}
+.verified-filter{display:flex;align-items:center;gap:5px;min-height:32px;font-size:11px;margin:4px 0}
+.verified-filter input{accent-color:var(--green)}
+.fit-results{width:100%;min-height:34px;border:1px solid #bccca9;background:#ecf2e1;color:#355c36;border-radius:6px;font-size:12px;margin:9px 0 1px}
+.pagination{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:12px 0;font-size:11px}
+.pagination button{min-height:36px;border:1px solid #b7caaa;border-radius:6px;background:#fffef8;color:var(--green);padding:6px 12px}
+.pagination button:disabled,.fit-results:disabled{opacity:.4;cursor:default}
+.source-tier{display:inline-block;font-size:10px!important;padding:2px 6px;background:#edf0e7;color:#627257!important;border-radius:4px}
+.map-japan{position:absolute;right:10px;top:10px;z-index:450;min-height:36px;padding:6px 10px;border:1px solid #b8c7a9;border-radius:6px;background:#fffef5f5;color:#395e39;font-size:12px;box-shadow:0 2px 6px #29433416}
+.map-frame:has(.botanical-popup) .map-japan{visibility:hidden}
+.map-message{max-width:calc(100% - 205px);padding:7px 11px;top:10px}
+.spot-card>button>span:last-child{overflow-wrap:anywhere;min-width:0}
+@media(max-width:700px){.map-message{left:60px;transform:none;max-width:calc(100% - 160px);font-size:10px;padding:5px 8px}.pagination button,.fit-results{min-height:42px}.map-japan{font-size:11px;padding:6px 8px}}

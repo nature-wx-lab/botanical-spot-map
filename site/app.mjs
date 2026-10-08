@@ -1,22 +1,25 @@
-import { PURPOSES, ENVIRONMENTS, PREFECTURES, safeUrl, validateCatalog, searchCatalog, currentObservations, facetCounts, mapLabelPlan, mapMarkerPlan, eventStatus } from './engine.mjs';
+import { PURPOSES, ENVIRONMENTS, PREFECTURES, safeUrl, mergeCatalog, searchCatalog, currentObservations, facetCounts, mapLabelPlan, mapClusterPlan, eventStatus } from './engine.mjs';
 const $ = id => document.getElementById(id);
 const node = (tag, text, className) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (className) e.className = className; return e; };
 const option = (value, text) => { const e = node('option', text); e.value = value; return e; };
 const japanBounds = [[23.8, 122.7], [45.7, 146.1]];
 let catalog, map, tiles, markers, refreshTimer, mapStopped = false;
 let mapMarkers = [], selectedFacilityId = null, rebuildingMarkers = false;
+let results = [], listPage = 0, inputTimer;
+let mapFrame;
+const PAGE_SIZE = 30;
 function setupMap() {
   if (!window.L) { $('map-message').textContent = '地図を起動できません。施設一覧からお探しください。'; return; }
-  map = L.map('map', { minZoom: 3, maxZoom: 17, scrollWheelZoom: true, maxBounds: [[17, 115], [49, 160]], maxBoundsViscosity: 0.8 });
+  map = L.map('map', { minZoom: 3, maxZoom: 17, scrollWheelZoom: true, fadeAnimation: false, maxBounds: [[17, 115], [49, 160]], maxBoundsViscosity: 0.8 });
   map.fitBounds(japanBounds, { padding: [20, 30] });
   tiles = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', { minZoom: 3, maxZoom: 17, attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">地理院タイル</a> · VMAP0' }).addTo(map);
   tiles.on('tileerror', () => { if (!mapStopped) $('map-error').hidden = false; });
   tiles.on('load', () => { if (!mapStopped && document.querySelector('.leaflet-tile-loaded')) $('map-error').hidden = true; });
   markers = L.layerGroup().addTo(map);
-  map.on('zoomend moveend resize', updateMapLabels);
+  map.on('moveend resize', () => { cancelAnimationFrame(mapFrame); mapFrame = requestAnimationFrame(drawMap); });
   new ResizeObserver(() => map.invalidateSize({ pan: false })).observe($('map'));
 }
-function filters() { return { query: $('query').value.trim(), peak: $('peak').checked, prefecture: $('prefecture').value, environment: $('environment').value, category: $('category').value, plant: $('plant').value, purposes: [...document.querySelectorAll('[name=purpose]:checked')].map(e => e.value) }; }
+function filters() { return { query: $('query').value.trim(), peak: $('peak').checked, verified: $('verified-only').checked, prefecture: $('prefecture').value, environment: $('environment').value, category: $('category').value, plant: $('plant').value, purposes: [...document.querySelectorAll('[name=purpose]:checked')].map(e => e.value) }; }
 const numberLabel = value => value.toLocaleString('ja-JP');
 function resetFilters() { $('search').reset(); $('extra-filters').open = false; render(); document.querySelector('.sidebar').scrollTop = 0; }
 function updateFilterUI(f, count, now) {
@@ -45,12 +48,13 @@ function updateFilterUI(f, count, now) {
   }
   for (const purpose of f.purposes) addChip(PURPOSES[purpose], () => { document.querySelector(`[name=purpose][value=${purpose}]`).checked = false; });
   if (f.peak) addChip('いま見頃あり', () => { $('peak').checked = false; });
+  if (f.verified) addChip('公式情報を確認した施設', () => { $('verified-only').checked = false; });
   const activeCount = chips.childElementCount;
   chips.hidden = activeCount === 0;
   $('reset-filters').disabled = activeCount === 0;
   $('search-guide').textContent = activeCount ? '選択中の条件を押すと、ひとつずつ解除できます' : '条件なし · 登録済みの全施設が対象です';
   $('conditions').textContent = activeCount ? `${activeCount}条件を適用` : '全施設';
-  const extraCount = Number(Boolean(f.category)) + Number(Boolean(f.environment));
+  const extraCount = Number(Boolean(f.plant)) + Number(Boolean(f.environment));
   $('extra-filter-count').textContent = extraCount ? `(${extraCount})` : '';
   $('result-count').textContent = numberLabel(count);
 }
@@ -96,6 +100,13 @@ function appendEventBadges(root, f) {
 function infoSection(root, heading) { const section = node('section'); section.append(node('h4', heading)); root.append(section); return section; }
 function facilityDetails(f) {
   const root = node('div', undefined, 'facility-info');
+  if (f.data_tier === 'open-data') {
+    infoSection(root, '公開データから収録').append(node('p', `${f.prefecture} ${f.city}の${catalog.categories.find(c => c.id === f.categories[0]).name}として掲載。ジャンル・目的は元の分類と名称による目安です。施設ごとの公式確認は未実施です。`));
+    infoSection(root, '訪問前の確認').append(node('p', '営業時間・来訪可否・移転や閉店・扱う植物・在庫・見頃は未確認です。掲載サイトなどで最新情報をご確認ください。位置は入口を保証しません。'));
+    const section = infoSection(root, 'データの出典');
+    section.append(officialLink('https://docs.overturemaps.org/guides/places/', 'Overture Maps Places'), node('p', `データ版 ${catalog.bulk.release} · 取得 ${dateLabel(catalog.bulk.retrieved_at)}`), node('p', f.source_providers.map(p => `${p.dataset} (${p.license})`).join(' / '), 'info-note'), node('p', `レコードID：${f.source_record_id}`, 'info-note'), officialLink('https://docs.overturemaps.org/attribution/', '出典・ライセンス案内'));
+    return root;
+  }
   const tags = node('div', undefined, 'facility-genres');
   for (const id of f.categories) tags.append(node('span', catalog.categories.find(c => c.id === id).name));
   root.append(tags);
@@ -141,16 +152,17 @@ function facilityPopup(f) {
   const popup = node('div', undefined, 'facility-popup'), heading = node('div', undefined, 'facility-heading');
   heading.append(genreIcon(f), node('h3', f.name));
   popup.append(heading, node('p', `${f.prefecture} ${f.city}`, 'facility-place'));
-  if (f.summary) popup.append(node('p', f.summary, 'facility-summary'));
+  if (f.summary && f.data_tier !== 'open-data') popup.append(node('p', f.summary, 'facility-summary'));
   popup.append(facilityDetails(f));
-  const link = officialLink(f.official_url, '公式サイトで最新情報を見る ↗'); link.className = 'facility-official'; popup.append(link);
+  const url = f.official_url || f.listing_url;
+  if (url) { const link = officialLink(url, f.data_tier === 'open-data' ? '掲載サイトで情報を確認 ↗' : '公式サイトで最新情報を見る ↗'); link.className = 'facility-official'; popup.append(link); }
   return popup;
 }
 function updateMapLabels() {
   if (!map || !catalog) return;
   const zoom = map.getZoom(), size = map.getSize();
   const points = mapMarkers.map(item => ({ facility: item.facility, ...map.latLngToContainerPoint(item.marker.getLatLng()) }));
-  const visible = new Set(mapMarkerPlan(points, zoom, size, selectedFacilityId));
+  const visible = new Set(points.map(p => p.facility.id));
   const plan = new Map(mapLabelPlan(points.filter(point => visible.has(point.facility.id) && point.facility.id !== selectedFacilityId), zoom, size).map(label => [label.id, label]));
   for (const item of mapMarkers) {
     const { facility: f, marker } = item, entry = plan.get(f.id);
@@ -165,23 +177,66 @@ function updateMapLabels() {
     const label = node('button', undefined, `map-place-label${entry.tier === 2 ? ' has-summary' : ''}`); label.type = 'button'; label.style.width = `${entry.width}px`;
     label.setAttribute('aria-label', `${f.name}の詳細を開く`); label.append(node('strong', f.name));
     if (entry.tier === 2) label.append(node('span', f.summary));
-    label.addEventListener('click', event => { event.stopPropagation(); marker.openPopup(); });
+    label.addEventListener('click', event => { event.stopPropagation(); selectFacility(f); });
     marker.bindTooltip(label, { permanent: true, interactive: true, direction: entry.direction, offset: [entry.direction === 'right' ? (zoom >= 12 ? 22 : 18) : (zoom >= 12 ? -22 : -18), 0], className: 'map-place-tooltip', opacity: 1 });
   }
+}
+function selectFacility(f) {
+  selectedFacilityId = f.id;
+  if (!map) return;
+  if (window.matchMedia('(max-width:700px)').matches) document.querySelector('.workspace').scrollTop = 0;
+  map.setView([f.location.lat, f.location.lon], Math.max(map.getZoom(), 14), { animate: false });
+  drawMap();
+  mapMarkers.find(item => item.facility.id === f.id)?.marker.openPopup();
+}
+function drawMap() {
+  if (!map || !catalog || rebuildingMarkers) return;
+  rebuildingMarkers = true;
+  markers.clearLayers(); mapMarkers = [];
+  const size = map.getSize(), zoom = map.getZoom();
+  const peakIds = new Set(results.filter(r => r.observations.length).map(r => r.facility.id));
+  const points = results.map(({ facility }) => ({ facility, ...map.latLngToContainerPoint([facility.location.lat, facility.location.lon]) }));
+  const plan = mapClusterPlan(points, zoom, size, selectedFacilityId);
+  for (const group of plan) {
+    if (group.points.length > 1) {
+      const count = group.points.length, html = node('span', numberLabel(count), 'cluster-count');
+      const marker = L.marker(map.containerPointToLatLng([group.x, group.y]), { icon: L.divIcon({ html, className: 'plant-cluster', iconSize: [46, 46], iconAnchor: [23, 23] }), title: `${count}施設。クリックで拡大`, alt: `${count}施設の集まり` });
+      marker.on('click', () => {
+        if (zoom >= 17) {
+          const box = node('div', undefined, 'cluster-list'); box.append(node('strong', `近接する ${count}施設`));
+          for (const point of group.points) { const button = node('button', point.facility.name); button.type = 'button'; button.addEventListener('click', () => selectFacility(point.facility)); box.append(button); }
+          marker.bindPopup(box, { maxHeight: 240, minWidth: 200 }).openPopup();
+        } else {
+          const bounds = L.latLngBounds(group.points.map(p => [p.facility.location.lat, p.facility.location.lon]));
+          map.fitBounds(bounds, { padding: [45, 45], maxZoom: Math.min(17, zoom + 3), animate: false });
+          if (map.getZoom() <= zoom) map.setZoom(zoom + 1);
+        }
+      });
+      markers.addLayer(marker); continue;
+    }
+    const facility = group.points[0].facility, icon = genreIcon(facility);
+    if (peakIds.has(facility.id)) icon.classList.add('has-peak');
+    const marker = L.marker([facility.location.lat, facility.location.lon], { icon: L.divIcon({ html: icon, className: 'genre-marker', iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17] }), title: facility.name, alt: facility.name });
+    marker.bindPopup(() => facilityPopup(facility), { className: 'botanical-popup', autoPan: false, maxWidth: Math.min(340, size.x - 48), minWidth: 200, maxHeight: Math.max(80, Math.min(360, size.y / 2 - 65)) });
+    marker.on('click', () => selectFacility(facility));
+    marker.on('popupopen', () => { selectedFacilityId = facility.id; $('map-message').hidden = true; updateMapLabels(); });
+    marker.on('popupclose', () => { if (!rebuildingMarkers && selectedFacilityId === facility.id) { selectedFacilityId = null; $('map-message').hidden = false; updateMapLabels(); } });
+    markers.addLayer(marker); mapMarkers.push({ marker, facility });
+  }
+  rebuildingMarkers = false;
+  updateMapLabels();
+  if (selectedFacilityId) mapMarkers.find(item => item.facility.id === selectedFacilityId)?.marker.openPopup();
+  $('map-message').hidden = Boolean(selectedFacilityId && mapMarkers.some(item => item.facility.id === selectedFacilityId));
+  $('map-message').textContent = `候補 ${numberLabel(results.length)}件 · 数字を押すと拡大`;
 }
 function card(result) {
   const { facility: f, observations, targets } = result;
   const e = node('article', undefined, 'spot-card');
   const details = node('details', undefined, 'spot-detail'); details.append(node('summary', '施設情報・見頃・出典を確認'));
-  const title = node('button'); title.append(genreIcon(f), node('span', f.name)); title.type = 'button'; title.addEventListener('click', () => {
-    if (!map) return;
-    if (window.matchMedia('(max-width:700px)').matches) document.querySelector('.workspace').scrollTop = 0;
-    map.setView([f.location.lat, f.location.lon], Math.max(map.getZoom(), 13), { animate: false });
-    mapMarkers.find(item => item.facility.id === f.id)?.marker.openPopup();
-  });
+  const title = node('button'); title.append(genreIcon(f), node('span', f.name)); title.type = 'button'; title.addEventListener('click', () => selectFacility(f));
   e.append(title, node('p', `${f.prefecture} ${f.city} · ${f.purposes.map(p => PURPOSES[p]).join('・')}`));
   e.append(node('p', catalog.categories.find(c => c.id === f.categories[0]).name, 'spot-genre'));
-  if (f.summary) e.append(node('p', f.summary, 'spot-summary'));
+  if (f.summary && f.data_tier !== 'open-data') e.append(node('p', f.summary, 'spot-summary'));
   appendEventBadges(e, f);
   for (const o of observations) {
     const t = targets.find(t => t.id === o.target_id), p = catalog.plants.find(p => p.id === t.plant_id);
@@ -191,49 +246,42 @@ function card(result) {
     details.append(source);
   }
   if (!observations.length) e.append(node('p', '現在の見頃は未確認'));
-  details.append(facilityDetails(f), officialLink(f.official_url, '施設の公式サイト'));
+  e.append(node('p', f.data_tier === 'open-data' ? '公開データ · 公式情報は未確認' : '公式情報を確認した施設', 'source-tier'));
+  details.addEventListener('toggle', () => { if (!details.open || details.dataset.loaded) return; details.dataset.loaded = 'true'; details.append(facilityDetails(f)); const url = f.official_url || f.listing_url; if (url) details.append(officialLink(url, f.data_tier === 'open-data' ? 'データに掲載されたサイト' : '施設の公式サイト')); });
   e.append(details);
   return e;
 }
-function render() {
-  if (!catalog) return;
-  const f = filters(), now = Date.now(), results = searchCatalog(catalog, f, now), list = $('result-list');
-  const reopenId = selectedFacilityId;
-  rebuildingMarkers = true; list.replaceChildren(); markers?.clearLayers(); mapMarkers = []; updateFilterUI(f, results.length, now);
+function renderList() {
+  const list = $('result-list'); list.replaceChildren();
   if (!results.length) {
     const empty = node('div', undefined, 'empty');
-    empty.append(node('h3', catalog.facilities.length ? '条件に合う登録情報がありません' : '施設データを順次整備します'));
-    empty.append(node('p', catalog.facilities.length ? (f.peak ? '条件に合う有効な見頃情報は登録されていません。見頃ではないという意味ではありません。' : '条件を変更すると、ほかの登録施設を探せます。') : '公式情報を確認した施設から追加します。'));
-    if (catalog.facilities.length) {
-      const reset = node('button', 'すべての登録施設に戻す', 'empty-reset'); reset.type = 'button'; reset.addEventListener('click', resetFilters); empty.append(reset);
-    }
-    list.append(empty);
+    empty.append(node('h3', '条件に合う登録情報がありません'), node('p', filters().peak ? '有効な見頃情報が未登録です。見頃ではないという意味ではありません。' : '植物の種類・屋内外が未確認の施設は、その条件では表示されません。条件を減らしてお試しください。'));
+    const reset = node('button', 'すべての登録施設に戻す', 'empty-reset'); reset.type = 'button'; reset.addEventListener('click', resetFilters); empty.append(reset); list.append(empty);
   }
-  for (const result of results) {
-    list.append(card(result));
-    if (map) {
-      const { facility, observations } = result;
-      const icon = genreIcon(facility); if (observations.length) icon.classList.add('has-peak');
-      const marker = L.marker([facility.location.lat, facility.location.lon], { icon: L.divIcon({ html: icon, className: 'genre-marker', iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17] }), title: facility.name, alt: facility.name });
-      marker.bindPopup(facilityPopup(facility), { className: 'botanical-popup', maxWidth: Math.min(340, map.getSize().x - 48), minWidth: 220, maxHeight: Math.max(130, Math.min(400, map.getSize().y - 100)), autoPanPadding: [16, 16] });
-      marker.on('popupopen', () => { selectedFacilityId = facility.id; $('map-message').hidden = true; updateMapLabels(); });
-      marker.on('popupclose', () => { if (!rebuildingMarkers && selectedFacilityId === facility.id) { selectedFacilityId = null; $('map-message').hidden = false; updateMapLabels(); } });
-      markers.addLayer(marker); mapMarkers.push({ marker, facility });
-    }
-  }
-  rebuildingMarkers = false;
-  selectedFacilityId = mapMarkers.some(item => item.facility.id === reopenId) ? reopenId : null;
-  $('map-message').hidden = Boolean(selectedFacilityId);
-  if (selectedFacilityId) mapMarkers.find(item => item.facility.id === selectedFacilityId).marker.openPopup();
-  updateMapLabels();
-  if (map) { $('map-message').textContent = !catalog.facilities.length ? '初期公開版 · 施設データを準備中' : results.length ? `候補 ${results.length}施設 · 近づくと名前と紹介を表示` : 'この条件の登録情報はありません'; }
-  const count = new Set(currentObservations(catalog).map(o => catalog.targets.find(t => t.id === o.target_id).facility_id)).size;
-  $('data-status').textContent = `登録 ${catalog.facilities.length}施設 · 有効な見頃 ${count}施設 · データ版 ${dateLabel(catalog.generated_at)}`;
+  const start = listPage * PAGE_SIZE;
+  for (const result of results.slice(start, start + PAGE_SIZE)) list.append(card(result));
+  $('page-status').textContent = results.length ? `${numberLabel(start + 1)}–${numberLabel(Math.min(start + PAGE_SIZE, results.length))} / ${numberLabel(results.length)}件` : '0件';
+  $('page-prev').disabled = listPage === 0;
+  $('page-next').disabled = start + PAGE_SIZE >= results.length;
+  $('fit-results').disabled = results.length === 0;
+}
+function render(resetPage = true) {
+  if (!catalog) return;
+  const f = filters(), now = Date.now();
+  results = searchCatalog(catalog, f, now);
+  if (resetPage) listPage = 0;
+  listPage = Math.min(listPage, Math.max(0, Math.ceil(results.length / PAGE_SIZE) - 1));
+  if (!results.some(r => r.facility.id === selectedFacilityId)) selectedFacilityId = null;
+  updateFilterUI(f, results.length, now); renderList(); drawMap();
+  $('data-status').textContent = `登録 ${numberLabel(catalog.facilities.length)}件 · 47都道府県 · 公開データ版 ${catalog.bulk.release}`;
 }
 for (const p of PREFECTURES) $('prefecture').append(option(p, p));
 $('search').addEventListener('submit', e => e.preventDefault());
-$('search').addEventListener('input', render);
-$('search').addEventListener('change', render);
+$('query').addEventListener('input', () => { clearTimeout(inputTimer); inputTimer = setTimeout(() => render(), 180); });
+$('search').addEventListener('change', () => { clearTimeout(inputTimer); render(); });
+for (const [id, delta] of [['page-prev', -1], ['page-next', 1]]) $(id).addEventListener('click', () => { listPage += delta; renderList(); $('result-heading').scrollIntoView({ block: 'start' }); });
+$('fit-results').addEventListener('click', () => { if (map && results.length) { selectedFacilityId = null; map.fitBounds(results.map(r => [r.facility.location.lat, r.facility.location.lon]), { padding: [35, 35], maxZoom: 14, animate: false }); drawMap(); } });
+$('map-japan').addEventListener('click', () => { selectedFacilityId = null; map?.fitBounds(japanBounds, { padding: [20, 30], animate: false }); drawMap(); });
 $('reset-filters').addEventListener('click', resetFilters);
 $('show-japan').addEventListener('click', () => { if (map) map.fitBounds(japanBounds, { padding: [20, 30] }); $('about').close(); });
 $('map-stop').addEventListener('click', () => { if (!map || !tiles) return; mapStopped = !mapStopped; if (mapStopped) map.removeLayer(tiles); else tiles.addTo(map); $('map-stop').textContent = mapStopped ? '地図通信を再開' : '地図通信を停止'; $('map-stop').setAttribute('aria-pressed', String(mapStopped)); $('map-error').hidden = true; });
@@ -241,18 +289,20 @@ $('about-open').addEventListener('click', () => $('about').showModal());
 $('about-close').addEventListener('click', () => $('about').close());
 setupMap();
 try {
-  const response = await fetch('./data/catalog.json', { cache: 'no-cache' });
-  if (!response.ok) throw new Error('公開データを取得できません');
-  catalog = validateCatalog(await response.json());
+  const responses = await Promise.all(['catalog.json', 'nationwide.json'].map(file => fetch(`./data/${file}`, { cache: 'no-cache' })));
+  if (responses.some(response => !response.ok)) throw new Error('公開データを取得できません');
+  const [manual, bulk] = await Promise.all(responses.map(response => response.json()));
+  catalog = mergeCatalog(manual, bulk);
   for (const c of catalog.categories) $('category').append(option(c.id, c.name));
   for (const p of catalog.plants) $('plant').append(option(p.id, p.name));
   const key = $('genre-key');
   for (const category of catalog.categories) { const item = node('li'); item.append(genreIcon({ categories: [category.id] }), node('span', category.name)); key.append(item); }
-  if (catalog.facilities.some(f => f.location.source_url.startsWith('https://www.openstreetmap.org/'))) map?.attributionControl.addAttribution('施設位置の一部 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>');
+  if (catalog.facilities.some(f => f.location.source_url?.startsWith('https://www.openstreetmap.org/'))) map?.attributionControl.addAttribution('施設位置の一部 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>');
   render();
-  refreshTimer = setInterval(render, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
-  window.addEventListener('pageshow', render);
+  map?.attributionControl.addAttribution('施設データ: <a href="https://docs.overturemaps.org/attribution/" target="_blank" rel="noopener noreferrer">Overture Maps</a>');
+  refreshTimer = setInterval(() => render(false), 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) render(false); });
+  window.addEventListener('pageshow', () => render(false));
 } catch {
   $('result-list').replaceChildren(node('p', '施設情報を読み込めません。時間をおいて再読み込みしてください。'));
   $('data-status').textContent = '公開データの取得・形式確認に失敗しました';

@@ -2,10 +2,26 @@ export const PURPOSES = { see: '見る', buy: '買う', learn: '学ぶ', experie
 export const ENVIRONMENTS = { outdoor: '屋外', indoor: '屋内', greenhouse: '温室', unknown: '屋内外未確認' };
 export const PREFECTURES = '北海道 青森県 岩手県 宮城県 秋田県 山形県 福島県 茨城県 栃木県 群馬県 埼玉県 千葉県 東京都 神奈川県 新潟県 富山県 石川県 福井県 山梨県 長野県 岐阜県 静岡県 愛知県 三重県 滋賀県 京都府 大阪府 兵庫県 奈良県 和歌山県 鳥取県 島根県 岡山県 広島県 山口県 徳島県 香川県 愛媛県 高知県 福岡県 佐賀県 長崎県 熊本県 大分県 宮崎県 鹿児島県 沖縄県'.split(' ');
 export function safeUrl(value) {
-  try { const u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password && !u.port && !/^(localhost|127\.|\[|0\.)/.test(u.hostname) && u.hostname.includes('.') ? u.href : null; } catch { return null; }
+  try { const u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password && !u.port && !/^(localhost|\[|\d+\.\d+\.\d+\.\d+$)/.test(u.hostname) && !/\.(local|localhost|internal)$/.test(u.hostname) && u.hostname.includes('.') ? u.href : null; } catch { return null; }
 }
 const validDate = value => typeof value === 'string' && /(?:Z|[+-]\d\d:\d\d)$/.test(value) && Number.isFinite(Date.parse(value));
 const fail = message => { throw new Error(message); };
+export const IMPORT_CATEGORIES = { flowers_and_gifts_store: ['florist', 'buy'], florist: ['florist', 'buy'], nursery_and_gardening_store: ['garden-center', 'buy'], botanical_garden: ['botanical-garden', 'see'], park: ['nature-trail', 'see'], hiking_trail: ['nature-trail', 'see'], national_park: ['nature-trail', 'see'], nature_reserve: ['nature-trail', 'see'], forest: ['nature-trail', 'see'], state_park: ['nature-trail', 'see'], farm: ['picking-farm', 'see'], urban_farm: ['allotment', 'experience'] };
+export function mergeCatalog(manual, bulk) {
+  validateCatalog(manual);
+  if (bulk.schema_version !== 1 || !/^\d{4}-\d{2}-\d{2}\.\d+$/.test(bulk.release) || !validDate(bulk.retrieved_at) || !Array.isArray(bulk.records) || bulk.records.length > 10000 || !Array.isArray(bulk.providers)) fail('全国データの形式が不正です');
+  const ids = new Set(manual.facilities.map(f => f.id));
+  const imported = bulk.records.map(r => {
+    if (!/^([a-f0-9]{8}-){1}[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(r.id) || ids.has(`ov-${r.id}`) || typeof r.name !== 'string' || !r.name.trim() || r.name.length > 160 || !PREFECTURES.includes(r.prefecture) || typeof r.city !== 'string' || r.city.length > 100 || !IMPORT_CATEGORIES[r.category] || !Number.isFinite(r.lat) || !Number.isFinite(r.lon) || r.lat < 20 || r.lat > 46 || r.lon < 122 || r.lon > 154 || !Number.isFinite(r.confidence) || r.confidence < .7 || r.confidence > 1 || (r.url !== null && !safeUrl(r.url)) || !Number.isInteger(r.source) || !bulk.providers[r.source]) fail('全国データの施設・出典が不正です');
+    ids.add(`ov-${r.id}`);
+    let [category, purpose] = IMPORT_CATEGORIES[r.category];
+    if (['farm', 'urban_farm'].includes(r.category) && /貸農園|体験農園|市民農園|シェア畑/.test(r.name)) { category = 'allotment'; purpose = 'experience'; }
+    const purposes = r.category === 'farm' && /狩り|摘み/.test(r.name) ? ['experience', 'harvest'] : [purpose];
+    return { id: `ov-${r.id}`, name: r.name, prefecture: r.prefecture, city: r.city, categories: [category], purposes, data_tier: 'open-data', listing_url: r.url, source_record_id: r.id, source_category: r.category, source_providers: bulk.providers[r.source], confidence: r.confidence, location: { lat: r.lat, lon: r.lon }, label_priority: 3, summary: `${r.prefecture}${r.city} · ${manual.categories.find(c => c.id === category).name}` };
+  });
+  if (bulk.count !== imported.length || !bulk.providers.every(group => Array.isArray(group) && group.length && group.every(p => typeof p.dataset === 'string' && p.dataset.length <= 60 && ['CDLA-Permissive-2.0', 'Apache-2.0', 'CC0-1.0'].includes(p.license)))) fail('全国データの件数・ライセンスが不正です');
+  return { ...manual, facilities: [...manual.facilities, ...imported], bulk: { release: bulk.release, retrieved_at: bulk.retrieved_at, count: bulk.count } };
+}
 function unique(items, label) {
   if (!Array.isArray(items)) fail(`${label}: 配列が必要です`);
   const ids = new Set();
@@ -23,6 +39,7 @@ export function validateCatalog(data) {
   unique(data.observations, '現地情報');
   unique(data.seasonal_calendars, '例年の見頃');
   const events = unique(data.events, 'イベント');
+  const facilitiesById = new Map(data.facilities.map(f => [f.id, f]));
   if (!Array.isArray(data.forecasts) || data.forecasts.length) fail('未対応の予想情報です');
   if (data.facilities.some(f => f.location?.source_url?.startsWith('https://www.openstreetmap.org/')) && (data.data_license?.url !== 'https://opendatacommons.org/licenses/odbl/1-0/' || !data.data_license?.attribution?.includes('OpenStreetMap contributors'))) fail('施設位置の出典・ライセンス表示が必要です');
   for (const entry of [...data.categories, ...data.plants]) if (typeof entry.name !== 'string' || !entry.name.trim()) fail('名称が必要です');
@@ -39,7 +56,7 @@ export function validateCatalog(data) {
   }
   for (const t of data.targets) {
     if (!facilities.has(t.facility_id) || !plants.has(t.plant_id) || typeof t.area !== 'string' || !t.area.trim() || !ENVIRONMENTS[t.environment] || !Array.isArray(t.purposes) || !t.purposes.length || t.purposes.some(p => !PURPOSES[p])) fail('植物・場所・目的の関係が不正です');
-    const f = data.facilities.find(f => f.id === t.facility_id);
+    const f = facilitiesById.get(t.facility_id);
     if (t.purposes.some(p => !f.purposes.includes(p))) fail('施設と対象の目的が矛盾しています');
     if (t.event_id !== undefined && (!events.has(t.event_id) || data.events.find(e => e.id === t.event_id).facility_id !== t.facility_id)) fail('イベントと植物の関係が不正です');
   }
@@ -66,23 +83,64 @@ export function eventStatus(event, now = Date.now()) {
   return now < Date.parse(event.ends_at) ? 'active' : 'ended';
 }
 const matchesEnvironment = (actual, filter) => !filter || actual === filter || (filter === 'indoor' && actual === 'greenhouse');
+const normalize = value => value.normalize('NFKC').toLocaleLowerCase('ja').replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const indexes = new WeakMap();
+const genreWords = { florist: '花店 生花店 お花屋 フローリスト フロリスト flower shop', 'garden-center': '園芸 園芸店 ガーデニング garden center', 'botanical-garden': '植物園 温室 botanical garden', 'nature-trail': '自然観察 散策 公園 緑地 遊歩道', 'picking-farm': '観光農園 果樹園', allotment: '体験農園 市民農園 貸農園' };
+function indexFor(data) {
+  if (indexes.has(data)) return indexes.get(data);
+  const targets = new Map(), plants = new Map(data.plants.map(p => [p.id, p.name]));
+  for (const t of data.targets) { if (!targets.has(t.facility_id)) targets.set(t.facility_id, []); targets.get(t.facility_id).push(t); }
+  const texts = new Map(data.facilities.map(f => [f.id, normalize([f.name, f.prefecture, f.city, ...(f.aliases || []), ...f.categories.map(id => `${data.categories.find(c => c.id === id)?.name || ''} ${genreWords[id] || ''}`), ...(targets.get(f.id) || []).map(t => plants.get(t.plant_id) || '')].join(' '))]));
+  const index = { targets, texts, events: new Map(data.events.map(e => [e.id, e])) }; indexes.set(data, index); return index;
+}
 export function searchCatalog(data, filters = {}, now = Date.now()) {
-  const query = (filters.query || '').normalize('NFKC').trim().toLocaleLowerCase('ja');
+  const words = normalize(filters.query || '').trim().split(/\s+/).filter(Boolean), index = indexFor(data);
   const purposes = filters.purposes || [];
   const current = currentObservations(data, now);
   return data.facilities.flatMap(f => {
     if (filters.prefecture && f.prefecture !== filters.prefecture) return [];
     if (filters.category && !f.categories.includes(filters.category)) return [];
+    if (filters.verified && f.data_tier === 'open-data') return [];
     if (purposes.length && !purposes.some(p => f.purposes.includes(p))) return [];
-    const allTargets = data.targets.filter(t => t.facility_id === f.id && (!t.event_id || ['scheduled', 'active'].includes(eventStatus(data.events.find(e => e.id === t.event_id), now))));
+    if (words.length && !words.every(word => index.texts.get(f.id).includes(word))) return [];
+    const allTargets = (index.targets.get(f.id) || []).filter(t => !t.event_id || ['scheduled', 'active'].includes(eventStatus(index.events.get(t.event_id), now)));
     const matchedTargets = allTargets.filter(t => (!filters.plant || t.plant_id === filters.plant) && matchesEnvironment(t.environment, filters.environment) && (!purposes.length || purposes.some(p => t.purposes.includes(p))));
     const records = current.filter(o => matchedTargets.some(t => t.id === o.target_id));
     if (filters.peak && !records.length) return [];
     if (!filters.peak && (filters.plant || filters.environment) && !matchedTargets.length) return [];
-    const plantNames = allTargets.map(t => data.plants.find(p => p.id === t.plant_id)?.name || '');
-    if (query && ![f.name, f.prefecture, f.city, ...(f.aliases || []), ...plantNames].join(' ').normalize('NFKC').toLocaleLowerCase('ja').includes(query)) return [];
     return [{ facility: f, targets: matchedTargets, observations: records }];
   });
+}
+
+// Aggregate visible candidates before creating DOM markers. No facility is
+// dropped from search counts. The selected facility always remains clickable.
+export function mapClusterPlan(points, zoom, size, selectedId = null) {
+  const groups = new Map(), singles = [];
+  const cell = Math.max(zoom >= 15 ? 38 : 64, Math.ceil(Math.sqrt(size.x * size.y / 180)));
+  for (const point of points) {
+    if (point.x < 0 || point.y < 0 || point.x > size.x || point.y > size.y) continue;
+    if (point.facility.id === selectedId || (zoom >= 7 && point.facility.label_priority === 1)) { singles.push({ points: [point], x: point.x, y: point.y }); continue; }
+    const key = `${Math.floor(point.x / cell)}/${Math.floor(point.y / cell)}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(point);
+  }
+  const clustered = [...groups.values()].map(items => ({ points: items, x: items.reduce((n, p) => n + p.x, 0) / items.length, y: items.reduce((n, p) => n + p.y, 0) / items.length }));
+  // Adjacent cells can have centroids at the same edge. Merge overlapping
+  // bubbles as well, so their counts stay readable without dropping records.
+  for (let changed = true; changed;) {
+    changed = false;
+    outer: for (let i = 0; i < clustered.length; i++) {
+      for (let j = i + 1; j < clustered.length; j++) {
+        const a = clustered[i], b = clustered[j];
+        if (Math.hypot(a.x - b.x, a.y - b.y) >= 50) continue;
+        const count = a.points.length + b.points.length;
+        a.x = (a.x * a.points.length + b.x * b.points.length) / count;
+        a.y = (a.y * a.points.length + b.y * b.points.length) / count;
+        a.points.push(...b.points); clustered.splice(j, 1); changed = true; break outer;
+      }
+    }
+  }
+  return [...singles, ...clustered];
 }
 
 // Count each facet with the other conditions retained, so users can see
