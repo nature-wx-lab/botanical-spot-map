@@ -101,10 +101,21 @@ function infoSection(root, heading) { const section = node('section'); section.a
 function facilityDetails(f) {
   const root = node('div', undefined, 'facility-info');
   if (f.data_tier === 'open-data') {
+    const introduction = infoSection(root, '施設の紹介・公式サイト');
+    const url = safeUrl(f.listing_url);
+    if (url) {
+      const link = officialLink(url, 'この施設の掲載サイトを見る ↗'); link.className = 'facility-official';
+      introduction.append(link, node('p', '収録元に掲載されたURLです。施設名・所在地をご確認ください。', 'info-note'));
+    } else {
+      introduction.append(node('p', 'この施設の紹介ページは未登録です。'));
+    }
+    const query = [f.prefecture, f.city, f.name].filter(Boolean).join(' ');
+    introduction.append(officialLink(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '施設名・地域でWeb検索 ↗'));
     infoSection(root, '公開データから収録').append(node('p', `${f.prefecture} ${f.city}の${catalog.categories.find(c => c.id === f.categories[0]).name}として掲載。ジャンル・目的は元の分類と名称による目安です。施設ごとの公式確認は未実施です。`));
     infoSection(root, '訪問前の確認').append(node('p', '営業時間・来訪可否・移転や閉店・扱う植物・在庫・見頃は未確認です。掲載サイトなどで最新情報をご確認ください。位置は入口を保証しません。'));
-    const section = infoSection(root, 'データの出典');
-    section.append(officialLink('https://docs.overturemaps.org/guides/places/', 'Overture Maps Places'), node('p', `データ版 ${catalog.bulk.release} · 取得 ${dateLabel(catalog.bulk.retrieved_at)}`), node('p', f.source_providers.map(p => `${p.dataset} (${p.license})`).join(' / '), 'info-note'), node('p', `レコードID：${f.source_record_id}`, 'info-note'), officialLink('https://docs.overturemaps.org/attribution/', '出典・ライセンス案内'));
+    const section = node('details', undefined, 'facility-sources');
+    section.append(node('summary', '収録データについて'), node('p', `Overture Maps Places · データ版 ${catalog.bulk.release} · 取得 ${dateLabel(catalog.bulk.retrieved_at)}`), node('p', f.source_providers.map(p => `${p.dataset} (${p.license})`).join(' / '), 'info-note'), node('p', `レコードID：${f.source_record_id}`, 'info-note'), node('p', '収録条件・ライセンスは「このMAPについて」で確認できます。', 'info-note'));
+    root.append(section);
     return root;
   }
   const tags = node('div', undefined, 'facility-genres');
@@ -154,8 +165,7 @@ function facilityPopup(f) {
   popup.append(heading, node('p', `${f.prefecture} ${f.city}`, 'facility-place'));
   if (f.summary && f.data_tier !== 'open-data') popup.append(node('p', f.summary, 'facility-summary'));
   popup.append(facilityDetails(f));
-  const url = f.official_url || f.listing_url;
-  if (url) { const link = officialLink(url, f.data_tier === 'open-data' ? '掲載サイトで情報を確認 ↗' : '公式サイトで最新情報を見る ↗'); link.className = 'facility-official'; popup.append(link); }
+  if (f.official_url) { const link = officialLink(f.official_url, '公式サイトで最新情報を見る ↗'); link.className = 'facility-official'; popup.append(link); }
   return popup;
 }
 function updateMapLabels() {
@@ -247,7 +257,7 @@ function card(result) {
   }
   if (!observations.length) e.append(node('p', '現在の見頃は未確認'));
   e.append(node('p', f.data_tier === 'open-data' ? '公開データ · 公式情報は未確認' : '公式情報を確認した施設', 'source-tier'));
-  details.addEventListener('toggle', () => { if (!details.open || details.dataset.loaded) return; details.dataset.loaded = 'true'; details.append(facilityDetails(f)); const url = f.official_url || f.listing_url; if (url) details.append(officialLink(url, f.data_tier === 'open-data' ? 'データに掲載されたサイト' : '施設の公式サイト')); });
+  details.addEventListener('toggle', () => { if (!details.open || details.dataset.loaded) return; details.dataset.loaded = 'true'; details.append(facilityDetails(f)); if (f.official_url) details.append(officialLink(f.official_url, '施設の公式サイト')); });
   e.append(details);
   return e;
 }
